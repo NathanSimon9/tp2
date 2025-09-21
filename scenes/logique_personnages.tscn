@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=20 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
 [ext_resource type="Texture2D" uid="uid://d1vweltt53ux8" path="res://medias/sauter.png" id="2_6bys2"]
@@ -11,10 +11,16 @@ script/source = "extends CharacterBody2D
 const SPEED := 200.0
 const BOOST_SPEED := 400.0
 const JUMP_VELOCITY := -400.0
-var anim := \"\"
+
 # États
 enum Etat { COURIR, MARCHE, REPOS, SAUT }
 var etat_courant := Etat.REPOS
+
+var start_position := Vector2.ZERO  # Position de départ
+
+func _ready() -> void:
+	start_position = global_position
+	$\"../Area2D\".connect(\"body_entered\", Callable(self, \"_on_area_2d_body_entered\"))
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
@@ -33,24 +39,19 @@ func _physics_process(delta: float) -> void:
 	match etat_courant:
 		Etat.SAUT:
 			$AnimatedSprite2D.play(\"sauter\")
-			# Ajoute la gravité
 			velocity += get_gravity() * delta
 			if Input.is_action_just_pressed(\"sauter\") and is_on_floor():
 				velocity.y = JUMP_VELOCITY
-				
-
 		Etat.REPOS:
 			$AnimatedSprite2D.play(\"repos\")
-			velocity.x = SPEED * delta
+			velocity.x = 0
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
-
 		Etat.MARCHE:
 			$AnimatedSprite2D.play(\"marcher\")
 			velocity.x = direction * SPEED
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
-
 		Etat.COURIR:
 			$AnimatedSprite2D.play(\"courire\")
 			velocity.x = direction * BOOST_SPEED
@@ -60,20 +61,28 @@ func _physics_process(delta: float) -> void:
 	# --- Flip du sprite selon direction ---
 	if velocity.x > 0:
 		$AnimatedSprite2D.flip_h = false
-	elif self.velocity.x < 0:
+	elif velocity.x < 0:
 		$AnimatedSprite2D.flip_h = true
 
 	# --- Déplacement ---
 	move_and_slide()
 
-	
-	
-
-
+# --- Gestion de la zone de mort ---
 func _on_area_2d_body_entered(body: Node2D) -> void:
-	pass # Replace with function body.
-	$delai_mort
-	hide()
+	if body == self:
+		_die_and_reset()
+
+func _die_and_reset() -> void:
+	velocity = Vector2.ZERO
+	$AnimatedSprite2D.visible = true
+	$AnimatedSprite2D.play(\"meurt\")
+
+		# attendre 1 seconde avant de réinitialiser
+	await get_tree().create_timer(1.0).timeout
+
+	global_position = start_position
+	$AnimatedSprite2D.play(\"repos\")
+	velocity = Vector2.ZERO
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qfwe2"]
@@ -103,6 +112,14 @@ region = Rect2(179, 0, 213, 377)
 [sub_resource type="AtlasTexture" id="AtlasTexture_wo6p4"]
 atlas = ExtResource("1_s3281")
 region = Rect2(605, 0, 213, 377)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0hakg"]
+atlas = ExtResource("2_qfwe2")
+region = Rect2(0, 0, 301, 356)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lg1iq"]
+atlas = ExtResource("2_qfwe2")
+region = Rect2(308, 0, 301, 356)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_onr3x"]
 atlas = ExtResource("2_qfwe2")
@@ -155,6 +172,17 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_0hakg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lg1iq")
+}],
+"loop": true,
+"name": &"meurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_onr3x")
 }, {
 "duration": 1.0,
@@ -188,8 +216,9 @@ script = SubResource("GDScript_6bys2")
 position = Vector2(293, 437)
 scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"courire"
-frame_progress = 0.959319
+animation = &"meurt"
+frame = 1
+frame_progress = 0.321616
 speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

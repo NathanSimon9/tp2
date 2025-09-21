@@ -3,12 +3,14 @@ extends CharacterBody2D
 # --- Constantes ---
 const SPEED := 50.0
 const GRAVITY := 800.0
+const WALK_RANGE := 150.0  # Distance max à gauche/droite depuis le départ
 
 # --- Variables ---
 var direction := 1
 var is_dead := false
+var start_position := Vector2.ZERO
 var left_limit := 0.0
-var right_limit := 300.0  # Modifie selon ton niveau
+var right_limit := 0.0
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
@@ -16,6 +18,9 @@ var right_limit := 300.0  # Modifie selon ton niveau
 
 func _ready() -> void:
 	head_hitbox.connect("body_entered", Callable(self, "_on_head_hitbox_body_entered"))
+	start_position = global_position
+	left_limit = start_position.x - WALK_RANGE
+	right_limit = start_position.x + WALK_RANGE
 
 func _physics_process(delta: float) -> void:
 	if is_dead:

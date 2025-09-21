@@ -90,7 +90,7 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_nenq2"]
 resource_name = "explode"
-length = 1.239
+length = 0.852
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true

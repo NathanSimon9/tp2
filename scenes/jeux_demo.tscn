@@ -4904,7 +4904,18 @@ position = Vector2(-470, -935)
 [node name="cameralimite_end" type="Marker2D" parent="."]
 position = Vector2(3396, 1239)
 
-[node name="enemy" parent="." instance=ExtResource("18_dhjg0")]
-position = Vector2(693, 378)
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="enemy" parent="Node2D" instance=ExtResource("18_dhjg0")]
+position = Vector2(2452, 337)
+
+[node name="enemy2" parent="Node2D" instance=ExtResource("18_dhjg0")]
+position = Vector2(2933, 335)
+
+[node name="enemy3" parent="Node2D" instance=ExtResource("18_dhjg0")]
+position = Vector2(1898, 337)
+
+[node name="enemy4" parent="Node2D" instance=ExtResource("18_dhjg0")]
+position = Vector2(824, 347)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

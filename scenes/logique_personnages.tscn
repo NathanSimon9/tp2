@@ -1,49 +1,209 @@
-[gd_scene load_steps=7 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=18 format=3 uid="uid://3uog7aftmdeu"]
 
-[ext_resource type="Texture2D" uid="uid://cigk6xcfhik8s" path="res://medias/sprites-1.png" id="1_s3281"]
+[ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
+[ext_resource type="Texture2D" uid="uid://d1vweltt53ux8" path="res://medias/sauter.png" id="2_6bys2"]
+[ext_resource type="Texture2D" uid="uid://bieolhmol4lkt" path="res://medias/repos.png" id="2_qfwe2"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_6bys2"]
-atlas = ExtResource("1_s3281")
-region = Rect2(204, 0, 204, 361)
+[sub_resource type="GDScript" id="GDScript_6bys2"]
+script/source = "extends CharacterBody2D
+
+# Vitesses
+const SPEED := 200.0
+const BOOST_SPEED := 400.0
+const JUMP_VELOCITY := -400.0
+var anim := \"\"
+# États
+enum Etat { COURIR, MARCHE, REPOS, SAUT }
+var etat_courant := Etat.REPOS
+
+func _physics_process(delta: float) -> void:
+	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
+
+	# --- Détection des états ---
+	if not is_on_floor():
+		etat_courant = Etat.SAUT
+	elif is_on_floor() and direction == 0:
+		etat_courant = Etat.REPOS
+	elif is_on_floor() and Input.is_key_pressed(KEY_ALT) and direction != 0:
+		etat_courant = Etat.COURIR
+	elif is_on_floor() and direction != 0:
+		etat_courant = Etat.MARCHE
+
+	# --- Application des états ---
+	match etat_courant:
+		Etat.SAUT:
+			$AnimatedSprite2D.play(\"sauter\")
+			# Ajoute la gravité
+			velocity += get_gravity() * delta
+			if Input.is_action_just_pressed(\"sauter\") and is_on_floor():
+				velocity.y = JUMP_VELOCITY
+				
+
+		Etat.REPOS:
+			$AnimatedSprite2D.play(\"repos\")
+			velocity.x = SPEED * delta
+			if Input.is_action_just_pressed(\"sauter\"):
+				velocity.y = JUMP_VELOCITY
+
+		Etat.MARCHE:
+			$AnimatedSprite2D.play(\"marcher\")
+			velocity.x = direction * SPEED
+			if Input.is_action_just_pressed(\"sauter\"):
+				velocity.y = JUMP_VELOCITY
+
+		Etat.COURIR:
+			$AnimatedSprite2D.play(\"courire\")
+			velocity.x = direction * BOOST_SPEED
+			if Input.is_action_just_pressed(\"sauter\"):
+				velocity.y = JUMP_VELOCITY
+
+	# --- Flip du sprite selon direction ---
+	if velocity.x > 0:
+		$AnimatedSprite2D.flip_h = false
+	elif self.velocity.x < 0:
+		$AnimatedSprite2D.flip_h = true
+
+	# --- Déplacement ---
+	move_and_slide()
+
+	
+	
+
+
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	pass # Replace with function body.
+	$delai_mort
+	hide()
+"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qfwe2"]
 atlas = ExtResource("1_s3281")
-region = Rect2(0, 0, 204, 361)
+region = Rect2(5, 394, 225, 394)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gwbwo"]
 atlas = ExtResource("1_s3281")
-region = Rect2(408, 0, 204, 361)
+region = Rect2(230, 394, 225, 394)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kyng0"]
+atlas = ExtResource("1_s3281")
+region = Rect2(455, 394, 225, 394)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7sgir"]
+atlas = ExtResource("1_s3281")
+region = Rect2(680, 394, 225, 394)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wuymh"]
+atlas = ExtResource("1_s3281")
+region = Rect2(392, 0, 213, 377)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tn5gq"]
+atlas = ExtResource("1_s3281")
+region = Rect2(179, 0, 213, 377)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wo6p4"]
+atlas = ExtResource("1_s3281")
+region = Rect2(605, 0, 213, 377)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_onr3x"]
+atlas = ExtResource("2_qfwe2")
+region = Rect2(109, 0, 201, 382)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gos7e"]
+atlas = ExtResource("2_qfwe2")
+region = Rect2(310, 0, 201, 382)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3hj08"]
+atlas = ExtResource("2_6bys2")
+region = Rect2(90, 0, 226, 427)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_30wqp"]
+atlas = ExtResource("2_6bys2")
+region = Rect2(316, 0, 226, 427)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_kyng0"]
 animations = [{
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6bys2")
-}, {
-"duration": 0.5,
+"duration": 0.6,
 "texture": SubResource("AtlasTexture_qfwe2")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_gwbwo")
+}, {
+"duration": 0.6,
+"texture": SubResource("AtlasTexture_kyng0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7sgir")
+}],
+"loop": true,
+"name": &"courire",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wuymh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tn5gq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wo6p4")
 }],
 "loop": true,
 "name": &"marcher",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_onr3x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gos7e")
+}],
+"loop": true,
+"name": &"repos",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_3hj08")
+}, {
+"duration": 7.1,
+"texture": SubResource("AtlasTexture_30wqp")
+}],
+"loop": false,
+"name": &"sauter",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7sgir"]
-size = Vector2(67, 57)
+size = Vector2(44, 107.25)
 
-[node name="personnages" type="CharacterBody2D"]
+[node name="personnages" type="CharacterBody2D" groups=["player"]]
+collision_layer = 3
+collision_mask = 3
+script = SubResource("GDScript_6bys2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(279, 415.873)
-scale = Vector2(0.313725, 0.313726)
+position = Vector2(293, 437)
+scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"marcher"
-frame_progress = 0.801849
-speed_scale = 1.02
+animation = &"courire"
+frame_progress = 0.959319
+speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(23.5, 18.5)
+position = Vector2(296, 444)
 shape = SubResource("RectangleShape2D_7sgir")
+
+[node name="delai_mort" type="Timer" parent="."]
+wait_time = 2.459
+one_shot = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(301, 414)
+scale = Vector2(1, 0.999999)
+zoom = Vector2(1.155, 1.155)
+
+[node name="BulletShoot" type="Marker2D" parent="."]
+position = Vector2(320, 468)

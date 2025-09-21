@@ -1,0 +1,107 @@
+[gd_scene load_steps=7 format=3 uid="uid://b1wx4204kcgk6"]
+
+[ext_resource type="Script" uid="uid://d3jjyxrq27kin" path="res://bullet.gd" id="1_y25gk"]
+[ext_resource type="Texture2D" uid="uid://dv30n78rtwqyc" path="res://medias/laserBlue05.png" id="2_l5glv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eoqba"]
+size = Vector2(37, 8)
+
+[sub_resource type="Animation" id="Animation_qncy5"]
+resource_name = "shutdown"
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 10.5561),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CPUParticles2D:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_tamys"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CPUParticles2D:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_26lx3"]
+_data = {
+&"RESET": SubResource("Animation_tamys"),
+&"shutdown": SubResource("Animation_qncy5")
+}
+
+[node name="Bullet" type="RigidBody2D"]
+script = ExtResource("1_y25gk")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+texture = ExtResource("2_l5glv")
+lifetime = 0.37
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(2, -4.76837e-07)
+rotation = 1.57174
+texture = ExtResource("2_l5glv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1.5, 0)
+shape = SubResource("RectangleShape2D_eoqba")
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_26lx3")
+}
+
+[connection signal="timeout" from="Timer" to="." method="disable"]

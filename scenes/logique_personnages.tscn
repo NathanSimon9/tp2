@@ -1,29 +1,52 @@
-[gd_scene load_steps=20 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=29 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
 [ext_resource type="Texture2D" uid="uid://d1vweltt53ux8" path="res://medias/sauter.png" id="2_6bys2"]
+[ext_resource type="Texture2D" uid="uid://kbgbm7nksnso" path="res://medias/mort.png" id="2_gwbwo"]
 [ext_resource type="Texture2D" uid="uid://bieolhmol4lkt" path="res://medias/repos.png" id="2_qfwe2"]
+[ext_resource type="Texture2D" uid="uid://dh2k24m61pf6j" path="res://medias/meurt zombie.png" id="3_kyng0"]
 
 [sub_resource type="GDScript" id="GDScript_6bys2"]
 script/source = "extends CharacterBody2D
 
-# Vitesses
+# --- Vitesse ---
 const SPEED := 200.0
 const BOOST_SPEED := 400.0
 const JUMP_VELOCITY := -400.0
 
-# États
-enum Etat { COURIR, MARCHE, REPOS, SAUT }
+# --- États ---
+enum Etat { COURIR, MARCHE, REPOS, SAUT, MORT }
 var etat_courant := Etat.REPOS
 
-var start_position := Vector2.ZERO  # Position de départ
+# --- Vie ---
+var max_hp := 3
+var hp := max_hp
+@onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()  # récupère tous les cœurs
+
+# --- Position de départ ---
+var start_position := Vector2.ZERO
 
 func _ready() -> void:
+	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
+	update_hearts()
 	$\"../Area2D\".connect(\"body_entered\", Callable(self, \"_on_area_2d_body_entered\"))
+
+func update_hearts():
+	for i in range(len(hearts)):
+		if i < hp:
+			hearts[i].texture = preload(\"res://medias/coeur.png\")
+		else:
+			hearts[i].texture = preload(\"res://medias/coeur_vide.png\")
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
+
+	# --- Gestion état MORT ---
+	if etat_courant == Etat.MORT:
+		velocity += get_gravity() * delta
+		move_and_slide()
+		return
 
 	# --- Détection des états ---
 	if not is_on_floor():
@@ -58,30 +81,65 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
 
-	# --- Flip du sprite selon direction ---
-	if velocity.x > 0:
-		$AnimatedSprite2D.flip_h = false
-	elif velocity.x < 0:
-		$AnimatedSprite2D.flip_h = true
+	# --- Flip ---
+	$AnimatedSprite2D.flip_h = velocity.x < 0
 
-	# --- Déplacement ---
 	move_and_slide()
 
-# --- Gestion de la zone de mort ---
+# --- Mort dans le trou ---
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	if body == self:
 		_die_and_reset()
 
 func _die_and_reset() -> void:
-	velocity = Vector2.ZERO
-	$AnimatedSprite2D.visible = true
-	$AnimatedSprite2D.play(\"meurt\")
+	etat_courant = Etat.MORT
 
-		# attendre 1 seconde avant de réinitialiser
+	# Knockback horizontal léger seulement
+	var knock_dir = sign(global_position.x - start_position.x)
+	if knock_dir == 0:
+		knock_dir = 1
+	velocity.x = 100 * knock_dir
+	velocity.y = 0
+
+	$AnimatedSprite2D.play(\"meurt\")
+	$AnimatedSprite2D.modulate = Color(1,1,1,0.5)  # semi-transparent
+
+	hp -= 1
+	update_hearts()
+
 	await get_tree().create_timer(1.0).timeout
 
 	global_position = start_position
+	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
+	etat_courant = Etat.REPOS
+	velocity = Vector2.ZERO
+
+# --- Mort par ennemi ---
+func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
+	hp -= 1
+	update_hearts()
+
+	etat_courant = Etat.MORT
+	var knock_dir = sign(global_position.x - enemy_global_position.x)
+	if knock_dir == 0:
+		knock_dir = 1
+	velocity.x = 300 * knock_dir
+	velocity.y = -200
+
+	$AnimatedSprite2D.modulate = Color(1,0.5,0.5,1)  # rouge
+	$AnimatedSprite2D.play(\"meurt_frapper\")
+
+	await get_tree().create_timer(1.0).timeout
+
+	if hp <= 0:
+		hp = max_hp
+		update_hearts()
+
+	global_position = start_position
+	$AnimatedSprite2D.modulate = Color(1,1,1,1)
+	$AnimatedSprite2D.play(\"repos\")
+	etat_courant = Etat.REPOS
 	velocity = Vector2.ZERO
 "
 
@@ -114,12 +172,40 @@ atlas = ExtResource("1_s3281")
 region = Rect2(605, 0, 213, 377)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0hakg"]
-atlas = ExtResource("2_qfwe2")
-region = Rect2(0, 0, 301, 356)
+atlas = ExtResource("2_gwbwo")
+region = Rect2(48, 0, 222, 423)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lg1iq"]
-atlas = ExtResource("2_qfwe2")
-region = Rect2(308, 0, 301, 356)
+atlas = ExtResource("2_gwbwo")
+region = Rect2(270, 0, 222, 423)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ewps"]
+atlas = ExtResource("2_gwbwo")
+region = Rect2(521, 0, 285, 396)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l3uw5"]
+atlas = ExtResource("2_gwbwo")
+region = Rect2(31, 396, 382, 396)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cv775"]
+atlas = ExtResource("2_gwbwo")
+region = Rect2(413, 396, 382, 396)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cgkrl"]
+atlas = ExtResource("3_kyng0")
+region = Rect2(31, 0, 240, 428)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ltmng"]
+atlas = ExtResource("3_kyng0")
+region = Rect2(255, 0, 240, 428)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kul21"]
+atlas = ExtResource("3_kyng0")
+region = Rect2(497, 0, 353, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bn7gp"]
+atlas = ExtResource("3_kyng0")
+region = Rect2(24, 382, 346, 303)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_onr3x"]
 atlas = ExtResource("2_qfwe2")
@@ -171,14 +257,40 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 0.6,
 "texture": SubResource("AtlasTexture_0hakg")
 }, {
-"duration": 1.0,
+"duration": 0.9,
 "texture": SubResource("AtlasTexture_lg1iq")
+}, {
+"duration": 0.6,
+"texture": SubResource("AtlasTexture_7ewps")
+}, {
+"duration": 1.1,
+"texture": SubResource("AtlasTexture_l3uw5")
+}, {
+"duration": 1.7,
+"texture": SubResource("AtlasTexture_cv775")
+}],
+"loop": false,
+"name": &"meurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 0.6,
+"texture": SubResource("AtlasTexture_cgkrl")
+}, {
+"duration": 0.9,
+"texture": SubResource("AtlasTexture_ltmng")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kul21")
+}, {
+"duration": 4.3,
+"texture": SubResource("AtlasTexture_bn7gp")
 }],
 "loop": true,
-"name": &"meurt",
+"name": &"meurt_frapper",
 "speed": 5.0
 }, {
 "frames": [{
@@ -212,13 +324,13 @@ collision_layer = 3
 collision_mask = 3
 script = SubResource("GDScript_6bys2")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." groups=["player"]]
+modulate = Color(1, 0.66, 0.66, 1)
 position = Vector2(293, 437)
 scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"meurt"
-frame = 1
-frame_progress = 0.321616
+animation = &"meurt_frapper"
+frame_progress = 0.421633
 speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

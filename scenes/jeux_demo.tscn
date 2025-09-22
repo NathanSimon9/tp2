@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=4 uid="uid://bryempit8ffdx"]
+[gd_scene load_steps=23 format=4 uid="uid://bryempit8ffdx"]
 
 [ext_resource type="Texture2D" uid="uid://jjtiemfhppyw" path="res://medias/Backgrounds/backgroundEmpty.png" id="1_j1d38"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_j5833"]
@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://y7mbj36e2kwu" path="res://medias/Default/cloud5.png" id="13_g6i1d"]
 [ext_resource type="Texture2D" uid="uid://dxtjj5sqqiwi2" path="res://medias/Default/cloud7.png" id="14_rbsgd"]
 [ext_resource type="Texture2D" uid="uid://esniagdsg1a7" path="res://medias/Default/cloud4.png" id="15_yi0y6"]
+[ext_resource type="Texture2D" uid="uid://cy1jgaai4p8pj" path="res://medias/coeur.png" id="18_7yiog"]
 [ext_resource type="PackedScene" uid="uid://c8jobqv0u4gu0" path="res://scenes/enemy.tscn" id="18_dhjg0"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3v0hw"]
@@ -4917,5 +4918,29 @@ position = Vector2(1898, 337)
 
 [node name="enemy4" parent="Node2D" instance=ExtResource("18_dhjg0")]
 position = Vector2(824, 347)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
+offset_left = 12.0
+offset_top = 28.0
+offset_right = 263.0
+offset_bottom = 112.0
+alignment = 1
+
+[node name="Heart1" type="TextureRect" parent="CanvasLayer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("18_7yiog")
+stretch_mode = 5
+
+[node name="Heart2" type="TextureRect" parent="CanvasLayer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("18_7yiog")
+stretch_mode = 5
+
+[node name="Heart3" type="TextureRect" parent="CanvasLayer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("18_7yiog")
+stretch_mode = 5
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

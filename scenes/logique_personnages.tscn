@@ -12,13 +12,14 @@ script/source = "extends CharacterBody2D
 # --- Vitesse ---
 const SPEED := 200.0
 const BOOST_SPEED := 400.0
-const JUMP_VELOCITY := -400.0
+const JUMP_VELOCITY := -500.0
 
 # --- États ---
 enum Etat { COURIR, MARCHE, REPOS, SAUT, MORT }
 var etat_courant := Etat.REPOS
 
 # --- Vie ---
+var has_died := false
 var max_hp := 3
 var hp := max_hp
 @onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()  # récupère tous les cœurs
@@ -27,10 +28,11 @@ var hp := max_hp
 var start_position := Vector2.ZERO
 
 func _ready() -> void:
+
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()
-	$\"../Area2D\".connect(\"body_entered\", Callable(self, \"_on_area_2d_body_entered\"))
+	
 
 func update_hearts():
 	for i in range(len(hearts)):
@@ -63,6 +65,12 @@ func _physics_process(delta: float) -> void:
 		Etat.SAUT:
 			$AnimatedSprite2D.play(\"sauter\")
 			velocity += get_gravity() * delta
+			if Input.is_action_just_pressed(\"marche\"):
+				velocity.x = direction * SPEED
+			if Input.is_action_just_pressed(\"marche_arriere\"):
+				velocity.x = direction * SPEED
+			if Input.is_action_just_pressed(\"courire\"):
+				velocity.x = direction * BOOST_SPEED
 			if Input.is_action_just_pressed(\"sauter\") and is_on_floor():
 				velocity.y = JUMP_VELOCITY
 		Etat.REPOS:
@@ -80,6 +88,7 @@ func _physics_process(delta: float) -> void:
 			velocity.x = direction * BOOST_SPEED
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
+				
 
 	# --- Flip ---
 	$AnimatedSprite2D.flip_h = velocity.x < 0
@@ -120,6 +129,9 @@ func _die_and_reset() -> void:
 
 # --- Mort par ennemi ---
 func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
+	if has_died:  # Si le personnage est déjà mort, on ne fait rien
+		return
+	has_died = true
 	hp -= 1
 	update_hearts()
 
@@ -134,6 +146,7 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	$AnimatedSprite2D.play(\"meurt_frapper\")
 
 	await get_tree().create_timer(1.0).timeout
+	has_died = false
 
 	if hp <= 0:
 		hp = max_hp
@@ -144,6 +157,10 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	$AnimatedSprite2D.play(\"repos\")
 	etat_courant = Etat.REPOS
 	velocity = Vector2.ZERO
+
+func apply_spring_force(force: Vector2) -> void:
+	velocity.y = force.y  # force directe vers le haut
+ 
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qfwe2"]
@@ -311,7 +328,7 @@ animations = [{
 "duration": 0.5,
 "texture": SubResource("AtlasTexture_3hj08")
 }, {
-"duration": 7.1,
+"duration": 5.7,
 "texture": SubResource("AtlasTexture_30wqp")
 }],
 "loop": false,
@@ -320,7 +337,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7sgir"]
-size = Vector2(44, 107.25)
+size = Vector2(44, 89.625)
 
 [node name="personnages" type="CharacterBody2D" groups=["player"]]
 collision_layer = 3
@@ -332,12 +349,11 @@ modulate = Color(1, 0.66, 0.66, 1)
 position = Vector2(293, 437)
 scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"meurt_frapper"
-frame_progress = 0.421633
+animation = &"sauter"
 speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(296, 444)
+position = Vector2(296, 452.813)
 shape = SubResource("RectangleShape2D_7sgir")
 
 [node name="delai_mort" type="Timer" parent="."]
@@ -347,7 +363,7 @@ one_shot = true
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(301, 414)
 scale = Vector2(1, 0.999999)
-zoom = Vector2(1.155, 1.155)
+zoom = Vector2(1.5, 1.5)
 
 [node name="BulletShoot" type="Marker2D" parent="."]
 position = Vector2(320, 468)

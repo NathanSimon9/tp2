@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://djxg8353m0u1q"]
+
+[ext_resource type="Texture2D" uid="uid://csdirtmvtajn2" path="res://medias/roue.png" id="1_16rbs"]
+[ext_resource type="Script" uid="uid://7wll5uwmyswg" path="res://boule_obstacle.gd" id="1_jcodm"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jcodm"]
+radius = 32.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l531s"]
+radius = 40.0
+
+[node name="RigidBody2D" type="RigidBody2D"]
+mass = 1.241
+script = ExtResource("1_jcodm")
+
+[node name="Roue" type="Sprite2D" parent="."]
+position = Vector2(1440, 40)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("1_16rbs")
+offset = Vector2(0, -20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1440, 38)
+shape = SubResource("CircleShape2D_jcodm")
+
+[node name="HitBoxBody" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxBody"]
+position = Vector2(1440, 38)
+shape = SubResource("CircleShape2D_l531s")
+
+[connection signal="body_entered" from="HitBoxBody" to="." method="_on_hit_box_body_body_entered"]

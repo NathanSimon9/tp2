@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=4 uid="uid://bryempit8ffdx"]
+[gd_scene load_steps=28 format=4 uid="uid://bryempit8ffdx"]
 
 [ext_resource type="Texture2D" uid="uid://jjtiemfhppyw" path="res://medias/Backgrounds/backgroundEmpty.png" id="1_j1d38"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_j5833"]
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://c14wo7l43p2b3" path="res://scenes/ressort.tscn" id="17_54wni"]
 [ext_resource type="Texture2D" uid="uid://cy1jgaai4p8pj" path="res://medias/coeur.png" id="18_7yiog"]
 [ext_resource type="PackedScene" uid="uid://c8jobqv0u4gu0" path="res://scenes/enemy.tscn" id="18_dhjg0"]
+[ext_resource type="PackedScene" uid="uid://b7wxtjdaodmis" path="res://scenes/coin.tscn" id="18_qv7rx"]
 [ext_resource type="Texture2D" uid="uid://i0m1et8dc1d3" path="res://medias/Default/cloud1.png" id="19_qv7rx"]
 [ext_resource type="Texture2D" uid="uid://crjpuvdjtc6q3" path="res://medias/Default/cloud6.png" id="20_3st0h"]
 
@@ -832,26 +833,6 @@ position = Vector2(-256, -848)
 [node name="cameralimite_end" type="Marker2D" parent="."]
 position = Vector2(3129, 1237)
 
-[node name="Node2D" type="Node2D" parent="."]
-
-[node name="enemy" parent="Node2D" instance=ExtResource("18_dhjg0")]
-position = Vector2(2452, 337)
-
-[node name="enemy2" parent="Node2D" instance=ExtResource("18_dhjg0")]
-position = Vector2(2933, 335)
-
-[node name="enemy3" parent="Node2D" instance=ExtResource("18_dhjg0")]
-position = Vector2(1898, 337)
-
-[node name="enemy4" parent="Node2D" instance=ExtResource("18_dhjg0")]
-position = Vector2(824, 347)
-
-[node name="RigidBody2D" parent="Node2D" instance=ExtResource("16_7yiog")]
-position = Vector2(8, -16)
-
-[node name="Node2D" parent="Node2D" instance=ExtResource("17_54wni")]
-position = Vector2(176, 352)
-
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
@@ -875,6 +856,26 @@ stretch_mode = 5
 layout_mode = 2
 texture = ExtResource("18_7yiog")
 stretch_mode = 5
+
+[node name="danger" type="Node2D" parent="."]
+
+[node name="enemy" parent="danger" instance=ExtResource("18_dhjg0")]
+position = Vector2(2452, 337)
+
+[node name="enemy2" parent="danger" instance=ExtResource("18_dhjg0")]
+position = Vector2(2933, 335)
+
+[node name="enemy3" parent="danger" instance=ExtResource("18_dhjg0")]
+position = Vector2(1898, 337)
+
+[node name="enemy4" parent="danger" instance=ExtResource("18_dhjg0")]
+position = Vector2(824, 347)
+
+[node name="RigidBody2D" parent="danger" instance=ExtResource("16_7yiog")]
+position = Vector2(8, -16)
+
+[node name="Node2D" parent="danger" instance=ExtResource("17_54wni")]
+position = Vector2(176, 352)
 
 [node name="mures" type="CharacterBody2D" parent="."]
 
@@ -933,5 +934,43 @@ texture = ExtResource("15_yi0y6")
 [node name="Cloud18" type="Sprite2D" parent="."]
 position = Vector2(584, -376)
 texture = ExtResource("19_qv7rx")
+
+[node name="coins" type="Node2D" parent="."]
+
+[node name="coin" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(168, 208)
+
+[node name="coin2" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(200, 112)
+
+[node name="coin3" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(288, 32)
+
+[node name="coin4" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(776, -112)
+
+[node name="coin5" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(888, -112)
+
+[node name="coin6" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(1128, -200)
+
+[node name="coin7" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(1424, -80)
+
+[node name="coin8" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(1416, 336)
+
+[node name="coin9" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(1520, -336)
+
+[node name="coin10" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(528, 312)
+
+[node name="coin11" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(2200, 336)
+
+[node name="coin12" parent="coins" instance=ExtResource("18_qv7rx")]
+position = Vector2(2816, 312)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

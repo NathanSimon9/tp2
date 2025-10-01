@@ -1,5 +1,6 @@
-[gd_scene load_steps=29 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=33 format=3 uid="uid://3uog7aftmdeu"]
 
+[ext_resource type="Texture2D" uid="uid://c2raopp0p6tsp" path="res://medias/acroupir.png" id="1_7sgir"]
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
 [ext_resource type="Texture2D" uid="uid://d1vweltt53ux8" path="res://medias/sauter.png" id="2_6bys2"]
 [ext_resource type="Texture2D" uid="uid://kbgbm7nksnso" path="res://medias/mort.png" id="2_gwbwo"]
@@ -15,7 +16,7 @@ const BOOST_SPEED := 400.0
 const JUMP_VELOCITY := -500.0
 
 # --- États ---
-enum Etat { COURIR, MARCHE, REPOS, SAUT, MORT }
+enum Etat { COURIR, MARCHE, REPOS, SAUT, MORT, ACROUPIR }
 var etat_courant := Etat.REPOS
 
 # --- Vie ---
@@ -24,16 +25,21 @@ var max_hp := 3
 var hp := max_hp
 @onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()  # récupère tous les cœurs
 
+# --- Pièces ---
+var coins := 0
+@onready var coin_label := $\"../CanvasLayer/CoinCounter/Label\"
+
 # --- Position de départ ---
 var start_position := Vector2.ZERO
 
 func _ready() -> void:
-
+	
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()
-	
+	update_coins()
 
+# --- Mets à jour les cœurs ---
 func update_hearts():
 	for i in range(len(hearts)):
 		if i < hp:
@@ -41,8 +47,18 @@ func update_hearts():
 		else:
 			hearts[i].texture = preload(\"res://medias/coeur_vide.png\")
 
+# --- Mets à jour les pièces ---
+func update_coins():
+	coin_label.text = str(coins)
+
+# --- Ajoute une pièce ---
+func add_coin(amount: int = 1) -> void:
+	coins += amount
+	update_coins()
+
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
+	var pressing_bas := Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or Input.is_action_pressed(\"bas\")
 
 	# --- Gestion état MORT ---
 	if etat_courant == Etat.MORT:
@@ -52,10 +68,15 @@ func _physics_process(delta: float) -> void:
 
 	# --- Détection des états ---
 	if not is_on_floor():
-		etat_courant = Etat.SAUT
+		if pressing_bas:
+			etat_courant = Etat.ACROUPIR
+		else:
+			etat_courant = Etat.SAUT
+	elif pressing_bas:
+		etat_courant = Etat.ACROUPIR
 	elif is_on_floor() and direction == 0:
 		etat_courant = Etat.REPOS
-	elif is_on_floor() and Input.is_key_pressed(KEY_ALT) and direction != 0:
+	elif is_on_floor() and Input.is_key_pressed(KEY_SHIFT) and direction != 0:
 		etat_courant = Etat.COURIR
 	elif is_on_floor() and direction != 0:
 		etat_courant = Etat.MARCHE
@@ -65,6 +86,8 @@ func _physics_process(delta: float) -> void:
 		Etat.SAUT:
 			$AnimatedSprite2D.play(\"sauter\")
 			velocity += get_gravity() * delta
+			if pressing_bas:
+				velocity.y = 600
 			if Input.is_action_just_pressed(\"marche\"):
 				velocity.x = direction * SPEED
 			if Input.is_action_just_pressed(\"marche_arriere\"):
@@ -73,22 +96,37 @@ func _physics_process(delta: float) -> void:
 				velocity.x = direction * BOOST_SPEED
 			if Input.is_action_just_pressed(\"sauter\") and is_on_floor():
 				velocity.y = JUMP_VELOCITY
+
 		Etat.REPOS:
 			$AnimatedSprite2D.play(\"repos\")
 			velocity.x = 0
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
+
 		Etat.MARCHE:
 			$AnimatedSprite2D.play(\"marcher\")
 			velocity.x = direction * SPEED
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
+
 		Etat.COURIR:
 			$AnimatedSprite2D.play(\"courire\")
 			velocity.x = direction * BOOST_SPEED
 			if Input.is_action_just_pressed(\"sauter\"):
 				velocity.y = JUMP_VELOCITY
+
+		Etat.ACROUPIR:
+			$AnimatedSprite2D.play(\"acroupir\")
+			if is_on_floor():
+				# glissement long
+				velocity.x = lerp(velocity.x, 0.0, 1.0 * delta)
+
 				
+			else:
+				velocity.y = 600
+	# --- Reset de la hitbox si pas accroupi ---
+	if etat_courant != Etat.ACROUPIR:
+		$CollisionShape2D.scale.y = 1.0
 
 	# --- Flip ---
 	$AnimatedSprite2D.flip_h = velocity.x < 0
@@ -102,25 +140,19 @@ func _on_area_2d_body_entered(body: Node2D) -> void:
 
 func _die_and_reset() -> void:
 	etat_courant = Etat.MORT
-
-	# Knockback horizontal léger seulement
 	var knock_dir = sign(global_position.x - start_position.x)
 	if knock_dir == 0:
 		knock_dir = 1
 	velocity.x = 100 * knock_dir
 	velocity.y = 0
-
 	$AnimatedSprite2D.play(\"meurt\")
-	$AnimatedSprite2D.modulate = Color(1,1,1,0.5)  # semi-transparent
-
+	$AnimatedSprite2D.modulate = Color(1,1,1,0.5)
 	hp -= 1
 	update_hearts()
-
 	await get_tree().create_timer(1.0).timeout
 	if hp <= 0:
 		hp = max_hp
 		update_hearts()
-
 	global_position = start_position
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
@@ -129,29 +161,24 @@ func _die_and_reset() -> void:
 
 # --- Mort par ennemi ---
 func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
-	if has_died:  # Si le personnage est déjà mort, on ne fait rien
+	if has_died:
 		return
 	has_died = true
 	hp -= 1
 	update_hearts()
-
 	etat_courant = Etat.MORT
 	var knock_dir = sign(global_position.x - enemy_global_position.x)
 	if knock_dir == 0:
 		knock_dir = 1
 	velocity.x = 300 * knock_dir
 	velocity.y = -200
-
-	$AnimatedSprite2D.modulate = Color(1,0.5,0.5,1)  # rouge
+	$AnimatedSprite2D.modulate = Color(1,0.5,0.5,1)
 	$AnimatedSprite2D.play(\"meurt_frapper\")
-
 	await get_tree().create_timer(1.0).timeout
 	has_died = false
-
 	if hp <= 0:
 		hp = max_hp
 		update_hearts()
-
 	global_position = start_position
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
@@ -159,9 +186,20 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	velocity = Vector2.ZERO
 
 func apply_spring_force(force: Vector2) -> void:
-	velocity.y = force.y  # force directe vers le haut
- 
+	velocity.y = force.y
 "
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3lvrx"]
+atlas = ExtResource("1_7sgir")
+region = Rect2(95, 0, 220, 493)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7eult"]
+atlas = ExtResource("1_7sgir")
+region = Rect2(339, 0, 221, 507)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l6u5r"]
+atlas = ExtResource("1_7sgir")
+region = Rect2(597, 0, 221, 507)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qfwe2"]
 atlas = ExtResource("1_s3281")
@@ -245,6 +283,26 @@ region = Rect2(316, 0, 226, 427)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_kyng0"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3lvrx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7eult")
+}, {
+"duration": 100.4,
+"texture": SubResource("AtlasTexture_l6u5r")
+}, {
+"duration": 100.4,
+"texture": SubResource("AtlasTexture_l6u5r")
+}, {
+"duration": 100.4,
+"texture": SubResource("AtlasTexture_l6u5r")
+}],
+"loop": false,
+"name": &"acroupir",
+"speed": 8.0
+}, {
 "frames": [{
 "duration": 0.6,
 "texture": SubResource("AtlasTexture_qfwe2")
@@ -349,7 +407,7 @@ modulate = Color(1, 0.66, 0.66, 1)
 position = Vector2(293, 437)
 scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"sauter"
+animation = &"acroupir"
 speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

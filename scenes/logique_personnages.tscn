@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=34 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://c2raopp0p6tsp" path="res://medias/acroupir.png" id="1_7sgir"]
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://kbgbm7nksnso" path="res://medias/mort.png" id="2_gwbwo"]
 [ext_resource type="Texture2D" uid="uid://bieolhmol4lkt" path="res://medias/repos.png" id="2_qfwe2"]
 [ext_resource type="Texture2D" uid="uid://dh2k24m61pf6j" path="res://medias/meurt zombie.png" id="3_kyng0"]
+[ext_resource type="Script" uid="uid://c0x2u3kphok71" path="res://scenes/camera_2d.gd" id="7_wuymh"]
 
 [sub_resource type="GDScript" id="GDScript_6bys2"]
 script/source = "extends CharacterBody2D
@@ -422,6 +423,7 @@ one_shot = true
 position = Vector2(301, 414)
 scale = Vector2(1, 0.999999)
 zoom = Vector2(1.5, 1.5)
+script = ExtResource("7_wuymh")
 
 [node name="BulletShoot" type="Marker2D" parent="."]
 position = Vector2(320, 468)

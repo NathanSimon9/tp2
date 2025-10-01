@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://ea4kkm0uasw4"]
+
+[ext_resource type="Script" uid="uid://cqneeo726rujq" path="res://affiche.gd" id="1_c4p0l"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yf5il"]
+size = Vector2(55, 30.75)
+
+[node name="PanneauMessage" type="Area2D"]
+script = ExtResource("1_c4p0l")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(143.5, -16)
+shape = SubResource("RectangleShape2D_yf5il")
+
+[node name="Message" type="Node2D" parent="."]
+
+[node name="fond" type="ColorRect" parent="Message"]
+offset_top = -237.0
+offset_right = 276.0
+offset_bottom = -80.0
+color = Color(0, 0, 0, 0.713726)
+metadata/_edit_group_ = true
+
+[node name="etiquette" type="Label" parent="Message/fond"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 277.0
+offset_bottom = 159.0
+theme_override_font_sizes/font_size = 26
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 20.0
+
+[connection signal="body_entered" from="." to="." method="show_message"]
+[connection signal="body_exited" from="." to="." method="hide_message"]

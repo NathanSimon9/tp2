@@ -1,0 +1,86 @@
+[gd_scene load_steps=5 format=3 uid="uid://j6fjxfy3lrru"]
+
+[ext_resource type="Script" uid="uid://cvjir2td8mxv0" path="res://menu_controle.gd" id="1_cixlm"]
+[ext_resource type="Texture2D" uid="uid://dnx8hi2qxag2n" path="res://medias/currency-coin-cartoon-png.png" id="2_5qrj1"]
+[ext_resource type="Texture2D" uid="uid://bxer5ne5ag8xb" path="res://medias/coeur_vide.png" id="2_kftfl"]
+
+[sub_resource type="Shortcut" id="Shortcut_kftfl"]
+
+[node name="MenuControle" type="CanvasLayer"]
+script = ExtResource("1_cixlm")
+
+[node name="PauseMenu" type="Panel" parent="."]
+offset_left = 2.0
+offset_top = 45.0
+offset_right = 1111.0
+offset_bottom = 645.0
+
+[node name="ShowInstructions" type="Button" parent="PauseMenu"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 255.0
+offset_top = 186.0
+offset_right = 805.0
+offset_bottom = 259.0
+
+[node name="ContinueButton" type="Button" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -188.5
+offset_top = -45.0
+offset_right = 188.5
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "continuer
+"
+
+[node name="InstructionsScreen" type="Panel" parent="."]
+unique_name_in_owner = true
+offset_left = 105.0
+offset_top = 99.0
+offset_right = 982.0
+offset_bottom = 551.0
+
+[node name="CloseButton" type="Button" parent="InstructionsScreen"]
+layout_mode = 0
+offset_left = 780.0
+offset_top = 43.0
+offset_right = 846.0
+offset_bottom = 102.0
+icon = ExtResource("2_kftfl")
+
+[node name="InstructionsLabel" type="Label" parent="InstructionsScreen"]
+layout_mode = 0
+offset_left = 147.0
+offset_top = 288.0
+offset_right = 804.0
+offset_bottom = 371.0
+
+[node name="InstructionsTitle" type="Label" parent="InstructionsScreen"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 28.0
+offset_right = 785.0
+offset_bottom = 115.0
+
+[node name="PauseButton" type="Button" parent="."]
+offset_left = 1045.0
+offset_top = 50.0
+offset_right = 1108.0
+offset_bottom = 116.0
+focus_mode = 0
+toggle_mode = true
+shortcut = SubResource("Shortcut_kftfl")
+icon = ExtResource("2_5qrj1")
+flat = true
+
+[connection signal="pressed" from="PauseMenu/ShowInstructions" to="." method="_on_show_instructions_button_pressed"]
+[connection signal="pressed" from="PauseMenu/ContinueButton" to="." method="continuer"]
+[connection signal="pressed" from="InstructionsScreen/CloseButton" to="." method="_on_close_instructions_button_pressed"]
+[connection signal="toggled" from="PauseButton" to="." method="_on_pause_button_toggled"]

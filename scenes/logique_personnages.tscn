@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=36 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://c2raopp0p6tsp" path="res://medias/acroupir.png" id="1_7sgir"]
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://bieolhmol4lkt" path="res://medias/repos.png" id="2_qfwe2"]
 [ext_resource type="Texture2D" uid="uid://dh2k24m61pf6j" path="res://medias/meurt zombie.png" id="3_kyng0"]
 [ext_resource type="Script" uid="uid://c0x2u3kphok71" path="res://scenes/camera_2d.gd" id="7_wuymh"]
+[ext_resource type="AudioStream" uid="uid://djrovsrssouto" path="res://sons/cartoon-jump-6462.mp3" id="8_tn5gq"]
+[ext_resource type="AudioStream" uid="uid://crj0ia7hponat" path="res://sons/man-death-scream-186763.mp3" id="9_wo6p4"]
 
 [sub_resource type="GDScript" id="GDScript_6bys2"]
 script/source = "extends CharacterBody2D
@@ -85,6 +87,7 @@ func _physics_process(delta: float) -> void:
 	# --- Application des états ---
 	match etat_courant:
 		Etat.SAUT:
+			
 			$AnimatedSprite2D.play(\"sauter\")
 			velocity += get_gravity() * delta
 			if pressing_bas:
@@ -102,18 +105,21 @@ func _physics_process(delta: float) -> void:
 			$AnimatedSprite2D.play(\"repos\")
 			velocity.x = 0
 			if Input.is_action_just_pressed(\"sauter\"):
+				$AudioStreamPlayer2D.play()
 				velocity.y = JUMP_VELOCITY
 
 		Etat.MARCHE:
 			$AnimatedSprite2D.play(\"marcher\")
 			velocity.x = direction * SPEED
 			if Input.is_action_just_pressed(\"sauter\"):
+				$AudioStreamPlayer2D.play()
 				velocity.y = JUMP_VELOCITY
 
 		Etat.COURIR:
 			$AnimatedSprite2D.play(\"courire\")
 			velocity.x = direction * BOOST_SPEED
 			if Input.is_action_just_pressed(\"sauter\"):
+				$AudioStreamPlayer2D.play()
 				velocity.y = JUMP_VELOCITY
 
 		Etat.ACROUPIR:
@@ -175,6 +181,7 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	velocity.y = -200
 	$AnimatedSprite2D.modulate = Color(1,0.5,0.5,1)
 	$AnimatedSprite2D.play(\"meurt_frapper\")
+	$AudioStreamPlayer2D2.play()
 	await get_tree().create_timer(1.0).timeout
 	has_died = false
 	if hp <= 0:
@@ -427,3 +434,11 @@ script = ExtResource("7_wuymh")
 
 [node name="BulletShoot" type="Marker2D" parent="."]
 position = Vector2(320, 468)
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("8_tn5gq")
+volume_db = 2.811
+
+[node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("9_wo6p4")
+volume_db = 3.748

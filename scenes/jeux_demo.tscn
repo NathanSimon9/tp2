@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=4 uid="uid://bryempit8ffdx"]
+[gd_scene load_steps=30 format=4 uid="uid://bryempit8ffdx"]
 
 [ext_resource type="Texture2D" uid="uid://jjtiemfhppyw" path="res://medias/Backgrounds/backgroundEmpty.png" id="1_j1d38"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_j5833"]
@@ -23,7 +23,6 @@
 [ext_resource type="Texture2D" uid="uid://crjpuvdjtc6q3" path="res://medias/Default/cloud6.png" id="20_3st0h"]
 [ext_resource type="Texture2D" uid="uid://dnx8hi2qxag2n" path="res://medias/currency-coin-cartoon-png.png" id="22_3st0h"]
 [ext_resource type="PackedScene" uid="uid://ea4kkm0uasw4" path="res://scenes/affiche.tscn" id="23_7vxg6"]
-[ext_resource type="PackedScene" uid="uid://j6fjxfy3lrru" path="res://scenes/menu_controle.tscn" id="24_0j4r4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3v0hw"]
 texture = ExtResource("1_j5833")
@@ -997,7 +996,5 @@ position = Vector2(2816, 312)
 [node name="affiche" parent="." groups=["death_area", "panneaux", "player"] instance=ExtResource("23_7vxg6")]
 position = Vector2(-248, 375)
 message = "SAUTER \"W\" MARCHER \"A\" \"D\" COURIR \"SHIFT\" BAISSER \"S\""
-
-[node name="MenuControle" parent="." instance=ExtResource("24_0j4r4")]
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

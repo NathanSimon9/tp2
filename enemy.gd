@@ -56,6 +56,8 @@ func die() -> void:
 	is_dead = true
 	velocity = Vector2.ZERO
 	anim.play("explode")
+	$AudioStreamPlayer2D.play()
+	$AudioStreamPlayer2D2.play()
 	anim.animation_finished.connect(Callable(self, "_on_explode_finished"))
 
 func _on_explode_finished(anim_name: String) -> void:

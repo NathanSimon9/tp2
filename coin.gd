@@ -11,6 +11,8 @@ func _on_body_entered(body: Node) -> void:
 		return
 	if body is CharacterBody2D:
 		taken = true
+		$AudioStreamPlayer2D2.play()
+		$AudioStreamPlayer2D.play()
 		$AnimationPlayer.play("taken")
 		if body.has_method("add_coin"):
 			body.add_coin()

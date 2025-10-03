@@ -9,6 +9,7 @@ func _on_body_entered(body: Node) -> void:
    # Vérifie si le corps a la méthode, peu importe sa scène d’origine
 	if body.has_method("apply_spring_force"):
 		body.apply_spring_force(spring_force)
+		$"../AudioStreamPlayer2D".play()
 		$"../AnimatedSprite2D".play("ressort")
 
 

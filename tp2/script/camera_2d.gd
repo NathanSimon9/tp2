@@ -1,8 +1,8 @@
 ## Caméra que fait zoom in quand le joueur est proche d'un panneau.
 class_name ControleCamera extends Camera2D
 
-@export var zoom_closed := 1.8
-@export var zoom_open := 1.5
+@export var zoom_closed := 2.3
+@export var zoom_open := 2
 @export var zoom_duration := 0.4
 
 var zoom_tween

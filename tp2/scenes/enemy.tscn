@@ -7,7 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://dtuyeuxxusa84" path="res://sons/puffofsmoke-47176.mp3" id="5_c4w8v"]
 
 [sub_resource type="Animation" id="Animation_xwavj"]
-length = 0.001
+length = 0.003
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -59,7 +59,7 @@ tracks/3/keys = {
 
 [sub_resource type="Animation" id="Animation_nenq2"]
 resource_name = "explode"
-length = 0.3875
+length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -79,7 +79,7 @@ tracks/1/path = NodePath("Sprite2D:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.0333333, 0.233333),
+"times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
@@ -91,7 +91,7 @@ tracks/2/path = NodePath("Explosion:emitting")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.0666667),
+"times": PackedFloat32Array(0.0333333),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
@@ -103,7 +103,7 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.5, 1.43333),
+"times": PackedFloat32Array(0.1, 0.3),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -120,7 +120,7 @@ tracks/4/path = NodePath("Explosion:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0.1, 1.6),
+"times": PackedFloat32Array(0.0333333, 0.3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]

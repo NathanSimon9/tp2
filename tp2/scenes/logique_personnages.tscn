@@ -44,6 +44,7 @@ func _ready() -> void:
 	start_position = global_position
 	update_hearts()
 	update_coins()
+	
 
 # --- Mets à jour les cœurs ---
 func update_hearts():
@@ -56,11 +57,15 @@ func update_hearts():
 # --- Mets à jour les pièces ---
 func update_coins():
 	coin_label.text = str(coins)
+	
 
 # --- Ajoute une pièce ---
 func add_coin(amount: int = 1) -> void:
 	coins += amount
 	update_coins()
+	
+	if coins > 14:
+		get_tree().reload_current_scene()
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
@@ -448,7 +453,7 @@ one_shot = true
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(301, 414)
 scale = Vector2(1, 0.999999)
-zoom = Vector2(1.5, 1.5)
+zoom = Vector2(2, 2)
 script = ExtResource("7_wuymh")
 
 [node name="BulletShoot" type="Marker2D" parent="."]

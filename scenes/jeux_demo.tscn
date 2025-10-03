@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" uid="uid://crjpuvdjtc6q3" path="res://medias/Default/cloud6.png" id="20_3st0h"]
 [ext_resource type="Texture2D" uid="uid://dnx8hi2qxag2n" path="res://medias/currency-coin-cartoon-png.png" id="22_3st0h"]
 [ext_resource type="PackedScene" uid="uid://ea4kkm0uasw4" path="res://scenes/affiche.tscn" id="23_7vxg6"]
+[ext_resource type="AudioStream" uid="uid://br4d7iirw42h1" path="res://sons/Kingdom of Fun.mp3" id="24_0j4r4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3v0hw"]
 texture = ExtResource("1_j5833")
@@ -654,20 +655,6 @@ tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
 sources/1 = SubResource("TileSetAtlasSource_3v0hw")
 
-[sub_resource type="GDScript" id="GDScript_moo7p"]
-script/source = "extends Area2D
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-"
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_moo7p"]
 size = Vector2(645, 218)
 
@@ -822,7 +809,6 @@ position = Vector2(-239, -106)
 modulate = Color(0.207843, 1, 1, 1)
 collision_layer = 2
 collision_mask = 2
-script = SubResource("GDScript_moo7p")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(1401.5, 538)
@@ -996,5 +982,11 @@ position = Vector2(2816, 312)
 [node name="affiche" parent="." groups=["death_area", "panneaux", "player"] instance=ExtResource("23_7vxg6")]
 position = Vector2(-248, 375)
 message = "SAUTER \"W\" MARCHER \"A\" \"D\" COURIR \"SHIFT\" BAISSER \"S\""
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("24_0j4r4")
+volume_db = -0.053
+autoplay = true
+parameters/looping = true
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

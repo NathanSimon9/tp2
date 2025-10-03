@@ -21,6 +21,7 @@ func zoom_in(_body):
 	zoom_tween = self.create_tween()
 	zoom_tween.set_trans(Tween.TRANS_CUBIC)
 	zoom_tween.tween_property(self, "zoom", Vector2.ONE * zoom_closed, zoom_duration)
+	
 
 
 func zoom_out(_body):

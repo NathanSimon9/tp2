@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dwol6635w6c3u"
+path="res://.godot/imported/Firefly_audio_man_drowning_screaming_under_water_variation2 (1).wav-05cd9af842be14bf8863d9bf574acf2d.sample"
+
+[deps]
+
+source_file="res://sons/Firefly_audio_man_drowning_screaming_under_water_variation2 (1).wav"
+dest_files=["res://.godot/imported/Firefly_audio_man_drowning_screaming_under_water_variation2 (1).wav-05cd9af842be14bf8863d9bf574acf2d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

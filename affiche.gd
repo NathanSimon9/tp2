@@ -8,6 +8,7 @@ func _ready() -> void:
 
 
 func show_message(_body):
+	$AudioStreamPlayer2D.play()
 	$Timer.start()
 	$Message.show()
 	$Message/fond/etiquette.text = message
@@ -18,3 +19,4 @@ func show_message(_body):
 func hide_message(_body) -> void:
 	$Timer.stop()
 	$Message.hide()
+	$AudioStreamPlayer2D.play()

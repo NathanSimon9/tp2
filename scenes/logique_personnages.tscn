@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=39 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://c2raopp0p6tsp" path="res://medias/acroupir.png" id="1_7sgir"]
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
@@ -6,9 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://kbgbm7nksnso" path="res://medias/mort.png" id="2_gwbwo"]
 [ext_resource type="Texture2D" uid="uid://bieolhmol4lkt" path="res://medias/repos.png" id="2_qfwe2"]
 [ext_resource type="Texture2D" uid="uid://dh2k24m61pf6j" path="res://medias/meurt zombie.png" id="3_kyng0"]
-[ext_resource type="Script" uid="uid://c0x2u3kphok71" path="res://scenes/camera_2d.gd" id="7_wuymh"]
+[ext_resource type="Script" uid="uid://c0x2u3kphok71" path="res://camera_2d.gd" id="7_wuymh"]
 [ext_resource type="AudioStream" uid="uid://djrovsrssouto" path="res://sons/cartoon-jump-6462.mp3" id="8_tn5gq"]
 [ext_resource type="AudioStream" uid="uid://crj0ia7hponat" path="res://sons/man-death-scream-186763.mp3" id="9_wo6p4"]
+[ext_resource type="AudioStream" uid="uid://dwol6635w6c3u" path="res://sons/Firefly_audio_man_drowning_screaming_under_water_variation2 (1).wav" id="10_3hj08"]
+[ext_resource type="AudioStream" uid="uid://d1cyr67d0cmbn" path="res://sons/Firefly_audio_grass_footstep_variation4.wav" id="11_30wqp"]
+[ext_resource type="AudioStream" uid="uid://cd41qr2iux8ew" path="res://sons/Firefly_audio_big_splash_variation3.wav" id="12_onr3x"]
 
 [sub_resource type="GDScript" id="GDScript_6bys2"]
 script/source = "extends CharacterBody2D
@@ -61,6 +64,7 @@ func add_coin(amount: int = 1) -> void:
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
+	
 	var pressing_bas := Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or Input.is_action_pressed(\"bas\")
 
 	# --- Gestion état MORT ---
@@ -153,6 +157,8 @@ func _die_and_reset() -> void:
 	velocity.x = 100 * knock_dir
 	velocity.y = 0
 	$AnimatedSprite2D.play(\"meurt\")
+	$AudioStreamPlayer2D5.play()
+	$AudioStreamPlayer2D3.play()
 	$AnimatedSprite2D.modulate = Color(1,1,1,0.5)
 	hp -= 1
 	update_hearts()
@@ -442,3 +448,14 @@ volume_db = 2.811
 [node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("9_wo6p4")
 volume_db = 3.748
+
+[node name="AudioStreamPlayer2D3" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("10_3hj08")
+volume_db = 6.559
+
+[node name="AudioStreamPlayer2D4" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("11_30wqp")
+
+[node name="AudioStreamPlayer2D5" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("12_onr3x")
+volume_db = 2.811

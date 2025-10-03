@@ -1,20 +1,20 @@
 [gd_scene load_steps=4 format=3 uid="uid://c1c7xqnnqgo8g"]
 
-[ext_resource type="Script" uid="uid://b4bshd6tfi2xt" path="res://scenes/moving_platform.gd" id="1_1tdcd"]
+[ext_resource type="Script" uid="uid://b4bshd6tfi2xt" path="res://script/moving_platform.gd" id="1_1tdcd"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_ms375"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1tdcd"]
-size = Vector2(59, 63)
+size = Vector2(62, 63)
 
-[node name="MovingPlatform" type="CharacterBody2D"]
+[node name="MovingPlatform_right" type="CharacterBody2D"]
 script = ExtResource("1_1tdcd")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_ms375")
 hframes = 18
 vframes = 18
-frame = 199
+frame = 277
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, 2.5)
+position = Vector2(0, 2.5)
 shape = SubResource("RectangleShape2D_1tdcd")

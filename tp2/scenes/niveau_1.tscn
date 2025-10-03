@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=4 uid="uid://bryempit8ffdx"]
+[gd_scene load_steps=32 format=4 uid="uid://bryempit8ffdx"]
 
 [ext_resource type="Texture2D" uid="uid://jjtiemfhppyw" path="res://medias/Backgrounds/backgroundEmpty.png" id="1_j1d38"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_j5833"]
@@ -25,6 +25,8 @@
 [ext_resource type="PackedScene" uid="uid://ea4kkm0uasw4" path="res://scenes/affiche.tscn" id="23_7vxg6"]
 [ext_resource type="AudioStream" uid="uid://br4d7iirw42h1" path="res://sons/Kingdom of Fun.mp3" id="24_0j4r4"]
 [ext_resource type="PackedScene" uid="uid://c1c7xqnnqgo8g" path="res://scenes/moving_platform.tscn" id="25_o5ck2"]
+
+[sub_resource type="GDScript" id="GDScript_o5ck2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_j68o2"]
 texture = ExtResource("1_j5833")
@@ -667,157 +669,131 @@ size = Vector2(5, 66)
 
 [node name="jeux" type="Node2D"]
 process_mode = 1
+script = SubResource("GDScript_o5ck2")
 
 [node name="BackgroundEmpty11" type="Sprite2D" parent="."]
 position = Vector2(-1628, 1882)
 scale = Vector2(1.02726, 7.74924)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty12" type="Sprite2D" parent="."]
 position = Vector2(4543, 1899)
 scale = Vector2(1.02726, 7.74924)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty6" type="Sprite2D" parent="."]
 position = Vector2(-586.045, 1879.23)
 scale = Vector2(1.02726, 7.74924)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty7" type="Sprite2D" parent="."]
 position = Vector2(437.951, 1932.91)
 rotation = 3.14159
 scale = Vector2(1.01354, -7.86896)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty8" type="Sprite2D" parent="."]
 position = Vector2(1475.81, 1831.74)
 rotation = 3.14159
 scale = Vector2(1.01354, -7.63159)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty9" type="Sprite2D" parent="."]
 position = Vector2(2513.67, 1730.52)
 rotation = 3.14159
 scale = Vector2(1.01354, -7.42168)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty10" type="Sprite2D" parent="."]
 position = Vector2(3551.53, 260.705)
 rotation = 3.14159
 scale = Vector2(1.01354, -4.54534)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty5" type="Sprite2D" parent="."]
 position = Vector2(3498.32, 621.42)
 scale = Vector2(-1.01354, 2.78375)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty4" type="Sprite2D" parent="."]
 position = Vector2(2488, 640.703)
 scale = Vector2(1, 2.82675)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty3" type="Sprite2D" parent="."]
 position = Vector2(1464, 604.361)
 scale = Vector2(1, 2.74148)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty2" type="Sprite2D" parent="."]
 position = Vector2(440, 568)
 scale = Vector2(1, 2.66608)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundEmpty" type="Sprite2D" parent="."]
 position = Vector2(-584, 40)
 scale = Vector2(1, 1.63281)
 texture = ExtResource("1_j1d38")
-metadata/_edit_group_ = true
 
 [node name="BackgroundCastles5" type="Sprite2D" parent="."]
 position = Vector2(3488, 186)
 texture = ExtResource("3_s0m0v")
-metadata/_edit_group_ = true
 
 [node name="BackgroundCastles4" type="Sprite2D" parent="."]
 position = Vector2(2469, 185)
 texture = ExtResource("3_s0m0v")
-metadata/_edit_group_ = true
 
 [node name="BackgroundCastles3" type="Sprite2D" parent="."]
 position = Vector2(1447, 186)
 texture = ExtResource("3_s0m0v")
-metadata/_edit_group_ = true
 
 [node name="BackgroundCastles2" type="Sprite2D" parent="."]
 position = Vector2(424, 186)
 texture = ExtResource("3_s0m0v")
-metadata/_edit_group_ = true
 
 [node name="BackgroundCastles" type="Sprite2D" parent="."]
 position = Vector2(-584, 184)
 texture = ExtResource("3_s0m0v")
-metadata/_edit_group_ = true
 
 [node name="Cloud2" type="Sprite2D" parent="."]
 position = Vector2(-67, -9)
 texture = ExtResource("11_7vxg6")
-metadata/_edit_group_ = true
 
 [node name="Cloud3" type="Sprite2D" parent="."]
 position = Vector2(675, -7)
 texture = ExtResource("12_0j4r4")
-metadata/_edit_group_ = true
 
 [node name="Cloud5" type="Sprite2D" parent="."]
 position = Vector2(1957, 26)
 texture = ExtResource("13_g6i1d")
-metadata/_edit_group_ = true
 
 [node name="Cloud7" type="Sprite2D" parent="."]
 position = Vector2(1298, 13)
 texture = ExtResource("14_rbsgd")
-metadata/_edit_group_ = true
 
 [node name="Cloud4" type="Sprite2D" parent="."]
 position = Vector2(3139, -20)
 texture = ExtResource("11_7vxg6")
-metadata/_edit_group_ = true
 
 [node name="Cloud6" type="Sprite2D" parent="."]
 position = Vector2(2571, 28)
 texture = ExtResource("15_yi0y6")
-metadata/_edit_group_ = true
 
 [node name="Bush1" type="Sprite2D" parent="."]
 position = Vector2(-235, 365)
 texture = ExtResource("5_moo7p")
-metadata/_edit_group_ = true
 
 [node name="Bush4" type="Sprite2D" parent="."]
 position = Vector2(645, 369)
 texture = ExtResource("7_7yiog")
-metadata/_edit_group_ = true
 
 [node name="BushOrange1" type="Sprite2D" parent="."]
 position = Vector2(988, 365)
 texture = ExtResource("8_54wni")
-metadata/_edit_group_ = true
 
 [node name="Cactus1" type="Sprite2D" parent="."]
 position = Vector2(1969, 325)
 texture = ExtResource("9_qv7rx")
-metadata/_edit_group_ = true
 
 [node name="CastleSmallAlt" type="Sprite2D" parent="."]
 position = Vector2(2525, 261)
@@ -830,7 +806,7 @@ tile_map_data = PackedByteArray("AAD6/wUAAQAHAA8AAAD7/wUAAQAHAA8AAAD8/wUAAQAHAA8
 tile_set = SubResource("TileSet_y6j1f")
 
 [node name="personnages" parent="." instance=ExtResource("2_3v0hw")]
-position = Vector2(-239, -106)
+position = Vector2(-250, -164)
 
 [node name="Area2D" type="Area2D" parent="." groups=["death_area", "player"]]
 modulate = Color(0.207843, 1, 1, 1)
@@ -1007,7 +983,7 @@ position = Vector2(2200, 336)
 position = Vector2(2816, 312)
 
 [node name="coin13" parent="coins" instance=ExtResource("18_qv7rx")]
-position = Vector2(2576, -241)
+position = Vector2(2572, -378)
 
 [node name="affiche" parent="." groups=["death_area", "panneaux", "player"] instance=ExtResource("23_7vxg6")]
 position = Vector2(-248, 375)
@@ -1020,9 +996,13 @@ autoplay = true
 parameters/looping = true
 
 [node name="MovingPlatform" parent="." instance=ExtResource("25_o5ck2")]
-position = Vector2(2021, -140)
+position = Vector2(2019, -140)
+script = SubResource("GDScript_o5ck2")
 
 [node name="MovingPlatform2" parent="." instance=ExtResource("25_o5ck2")]
 position = Vector2(2082, -140)
+
+[node name="MovingPlatform3" parent="." instance=ExtResource("25_o5ck2")]
+position = Vector2(2145, -140)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

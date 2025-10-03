@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://ea4kkm0uasw4"]
 
-[ext_resource type="Script" uid="uid://8ibtr4wi06m7" path="res://affiche.gd" id="1_c4p0l"]
+[ext_resource type="Script" uid="uid://8ibtr4wi06m7" path="res://script/affiche.gd" id="1_c4p0l"]
 [ext_resource type="AudioStream" uid="uid://dfc4j03l7k4qn" path="res://sons/movement-swipe-whoosh-3-186577.mp3" id="2_yf5il"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yf5il"]

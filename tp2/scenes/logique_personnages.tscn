@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://kbgbm7nksnso" path="res://medias/mort.png" id="2_gwbwo"]
 [ext_resource type="Texture2D" uid="uid://bieolhmol4lkt" path="res://medias/repos.png" id="2_qfwe2"]
 [ext_resource type="Texture2D" uid="uid://dh2k24m61pf6j" path="res://medias/meurt zombie.png" id="3_kyng0"]
-[ext_resource type="Script" uid="uid://c0x2u3kphok71" path="res://camera_2d.gd" id="7_wuymh"]
+[ext_resource type="Script" uid="uid://c0x2u3kphok71" path="res://script/camera_2d.gd" id="7_wuymh"]
 [ext_resource type="AudioStream" uid="uid://djrovsrssouto" path="res://sons/cartoon-jump-6462.mp3" id="8_tn5gq"]
 [ext_resource type="AudioStream" uid="uid://crj0ia7hponat" path="res://sons/man-death-scream-186763.mp3" id="9_wo6p4"]
 [ext_resource type="AudioStream" uid="uid://dwol6635w6c3u" path="res://sons/Firefly_audio_man_drowning_screaming_under_water_variation2 (1).wav" id="10_3hj08"]
@@ -136,8 +136,8 @@ func _physics_process(delta: float) -> void:
 			else:
 				velocity.y = 600
 	# --- Reset de la hitbox si pas accroupi ---
-	if etat_courant != Etat.ACROUPIR:
-		$CollisionShape2D.scale.y = 1.0
+	
+		
 
 	# --- Flip ---
 	$AnimatedSprite2D.flip_h = velocity.x < 0

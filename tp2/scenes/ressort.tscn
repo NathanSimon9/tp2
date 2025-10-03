@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://c14wo7l43p2b3"]
 
-[ext_resource type="Script" uid="uid://cw2sbi8auueh5" path="res://logique_ressort.gd" id="1_lbnmf"]
+[ext_resource type="Script" uid="uid://cw2sbi8auueh5" path="res://script/logique_ressort.gd" id="1_lbnmf"]
 [ext_resource type="Texture2D" uid="uid://3qy76oggbf80" path="res://medias/spring_out.png" id="2_26gpw"]
 [ext_resource type="Texture2D" uid="uid://5pt2ttmj1nx4" path="res://medias/spring.png" id="3_26gpw"]
 [ext_resource type="AudioStream" uid="uid://dxe3blkibtlmn" path="res://sons/boing-spring-mouth-harp-04-20-13-4-103346.mp3" id="4_bokgj"]

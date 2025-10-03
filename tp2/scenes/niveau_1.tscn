@@ -806,7 +806,7 @@ tile_map_data = PackedByteArray("AAD6/wUAAQAHAA8AAAD7/wUAAQAHAA8AAAD8/wUAAQAHAA8
 tile_set = SubResource("TileSet_y6j1f")
 
 [node name="personnages" parent="." instance=ExtResource("2_3v0hw")]
-position = Vector2(-250, -164)
+position = Vector2(1203, -774)
 
 [node name="Area2D" type="Area2D" parent="." groups=["death_area", "player"]]
 modulate = Color(0.207843, 1, 1, 1)
@@ -995,14 +995,10 @@ volume_db = -0.053
 autoplay = true
 parameters/looping = true
 
-[node name="MovingPlatform" parent="." instance=ExtResource("25_o5ck2")]
-position = Vector2(2019, -140)
-script = SubResource("GDScript_o5ck2")
-
 [node name="MovingPlatform2" parent="." instance=ExtResource("25_o5ck2")]
-position = Vector2(2082, -140)
+position = Vector2(2176, -150)
 
 [node name="MovingPlatform3" parent="." instance=ExtResource("25_o5ck2")]
-position = Vector2(2145, -140)
+position = Vector2(2239, -150)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]

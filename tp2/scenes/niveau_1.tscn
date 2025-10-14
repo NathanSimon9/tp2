@@ -839,7 +839,7 @@ tile_map_data = PackedByteArray("AAD6/wUAAQAHAA8AAAD7/wUAAQAHAA8AAAD8/wUAAQAHAA8
 tile_set = SubResource("TileSet_y6j1f")
 
 [node name="personnages" parent="." instance=ExtResource("2_3v0hw")]
-position = Vector2(-249, -126)
+position = Vector2(-514, -132)
 
 [node name="Area2D" type="Area2D" parent="." groups=["death_area", "player"]]
 modulate = Color(0.207843, 1, 1, 1)

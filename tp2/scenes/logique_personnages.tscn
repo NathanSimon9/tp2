@@ -31,6 +31,8 @@ var max_hp := 3
 var hp := max_hp
 @onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()  # récupère tous les cœurs
 
+
+
 # --- Pièces ---
 var coins := 0
 @onready var coin_label := $\"../CanvasLayer/CoinCounter/Label\"
@@ -39,7 +41,6 @@ var coins := 0
 var start_position := Vector2.ZERO
 
 func _ready() -> void:
-	
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()

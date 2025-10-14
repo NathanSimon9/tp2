@@ -1120,5 +1120,29 @@ shape = SubResource("RectangleShape2D_gp3mn")
 position = Vector2(29, 16)
 shape = SubResource("RectangleShape2D_gp3mn")
 
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
+
+[node name="VictoryLabel" type="Label" parent="CanvasLayer2"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -248.5
+offset_top = -39.0
+offset_right = 248.5
+offset_bottom = 39.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.246433, 0.701242, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/line_spacing = -13
+theme_override_constants/paragraph_spacing = -18
+theme_override_constants/outline_size = 8
+theme_override_constants/shadow_outline_size = 24
+theme_override_font_sizes/font_size = 90
+text = "FÉLICITATION  !!!!!!"
+
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="Area2D2" to="personnages" method="_on_area_2d_2_body_entered"]

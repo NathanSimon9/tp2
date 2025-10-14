@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=40 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://c2raopp0p6tsp" path="res://medias/acroupir.png" id="1_7sgir"]
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
@@ -12,6 +12,7 @@
 [ext_resource type="AudioStream" uid="uid://dwol6635w6c3u" path="res://sons/Firefly_audio_man_drowning_screaming_under_water_variation2 (1).wav" id="10_3hj08"]
 [ext_resource type="AudioStream" uid="uid://d1cyr67d0cmbn" path="res://sons/Firefly_audio_grass_footstep_variation4.wav" id="11_30wqp"]
 [ext_resource type="AudioStream" uid="uid://cd41qr2iux8ew" path="res://sons/Firefly_audio_big_splash_variation3.wav" id="12_onr3x"]
+[ext_resource type="AudioStream" uid="uid://br4xu48a277d8" path="res://sons/Firefly_audio_winning_sound_for_game_variation1.wav" id="13_gos7e"]
 
 [sub_resource type="GDScript" id="GDScript_6bys2"]
 script/source = "extends CharacterBody2D
@@ -31,8 +32,6 @@ var max_hp := 3
 var hp := max_hp
 @onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()  # récupère tous les cœurs
 
-
-
 # --- Pièces ---
 var coins := 0
 @onready var coin_label := $\"../CanvasLayer/CoinCounter/Label\"
@@ -40,12 +39,16 @@ var coins := 0
 # --- Position de départ ---
 var start_position := Vector2.ZERO
 
+# --- Mouvement autorisé ---
+var can_move := true  # bloque le mouvement du joueur après victoire
+
 func _ready() -> void:
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()
 	update_coins()
-	
+	# Masquer le label de victoire au début
+	$\"../CanvasLayer2/VictoryLabel\".visible = false
 
 # --- Mets à jour les cœurs ---
 func update_hearts():
@@ -58,19 +61,46 @@ func update_hearts():
 # --- Mets à jour les pièces ---
 func update_coins():
 	coin_label.text = str(coins)
-	
 
 # --- Ajoute une pièce ---
 func add_coin(amount: int = 1) -> void:
 	coins += amount
 	update_coins()
 	
-	if coins > 14:
-		get_tree().reload_current_scene()
+	if coins > 2:
+		win_game()  # Nouvelle fonction pour gagner
 
-func _physics_process(delta: float) -> void:
-	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
+# --- Fonction victoire ---
+func win_game():
+	var victory_label = $\"../CanvasLayer2/VictoryLabel\"
+	victory_label.text = \"Bravo ! Vous avez gagné !\"
+	victory_label.visible = true
+	$AudioStreamPlayer2D6.play()
+	$\"../AudioStreamPlayer2D\".stop()
+	$\"../AudioStreamPlayer2D2\".stop()
+	$\"../AudioStreamPlayer2D3\".stop()
+	$\"../AudioStreamPlayer2D4\".stop()
 	
+	# Bloquer le mouvement horizontal
+	can_move = false
+	
+	$AnimatedSprite2D.play(\"repos\")
+	velocity.x = 0
+	etat_courant = Etat.REPOS
+
+	# Après 3 secondes, revenir à l'écran d'accueil
+	await get_tree().create_timer(5.0).timeout
+	get_tree().reload_current_scene()
+
+# --- Physique et états ---
+func _physics_process(delta: float) -> void:
+	if not can_move:
+		# Applique juste la gravité si le joueur ne peut plus bouger
+		velocity += get_gravity() * delta
+		move_and_slide()
+		return
+
+	var direction := Input.get_axis(\"marche_arriere\", \"marche\")
 	var pressing_bas := Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or Input.is_action_pressed(\"bas\")
 
 	# --- Gestion état MORT ---
@@ -97,7 +127,6 @@ func _physics_process(delta: float) -> void:
 	# --- Application des états ---
 	match etat_courant:
 		Etat.SAUT:
-			
 			$AnimatedSprite2D.play(\"sauter\")
 			velocity += get_gravity() * delta
 			if pressing_bas:
@@ -135,15 +164,9 @@ func _physics_process(delta: float) -> void:
 		Etat.ACROUPIR:
 			$AnimatedSprite2D.play(\"acroupir\")
 			if is_on_floor():
-				# glissement long
 				velocity.x = lerp(velocity.x, 0.0, 1.0 * delta)
-
-				
 			else:
 				velocity.y = 600
-	# --- Reset de la hitbox si pas accroupi ---
-	
-		
 
 	# --- Flip ---
 	$AnimatedSprite2D.flip_h = velocity.x < 0
@@ -154,8 +177,6 @@ func _physics_process(delta: float) -> void:
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	if body == self:
 		_die_and_reset()
-
-
 
 func _die_and_reset() -> void:
 	etat_courant = Etat.MORT
@@ -210,16 +231,9 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 func apply_spring_force(force: Vector2) -> void:
 	velocity.y = force.y
 
-
-
-	
-	
-
-
 func _on_area_2d_2_body_entered(body: Node2D) -> void:
 	if body.has_method(\"_die_hit_and_reset\"):
-			body._die_hit_and_reset(global_position)
-	pass # Replace with function body.
+		body._die_hit_and_reset(global_position)
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3lvrx"]
@@ -478,3 +492,6 @@ stream = ExtResource("11_30wqp")
 [node name="AudioStreamPlayer2D5" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("12_onr3x")
 volume_db = 2.811
+
+[node name="AudioStreamPlayer2D6" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("13_gos7e")

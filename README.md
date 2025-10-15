@@ -13,3 +13,9 @@
 
 ## But
 Rammasser toutes les pieces sans perdre ses trois vies pour gagner le niveau
+
+## Obstacles à éviter
+### Zombie
+### Boule tranchante
+### Sable mouvent
+### Eau

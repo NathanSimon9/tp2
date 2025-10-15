@@ -28,9 +28,10 @@ var etat_courant := Etat.REPOS
 
 # --- Vie ---
 var has_died := false
+var has_won := false # ✅ empêche de mourir après victoire
 var max_hp := 3
 var hp := max_hp
-@onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()  # récupère tous les cœurs
+@onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()
 
 # --- Pièces ---
 var coins := 0
@@ -40,14 +41,13 @@ var coins := 0
 var start_position := Vector2.ZERO
 
 # --- Mouvement autorisé ---
-var can_move := true  # bloque le mouvement du joueur après victoire
+var can_move := true  # bloque le mouvement du joueur après victoire ou défaite
 
 func _ready() -> void:
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()
 	update_coins()
-	# Masquer le label de victoire au début
 	$\"../CanvasLayer2/VictoryLabel\".visible = false
 
 # --- Mets à jour les cœurs ---
@@ -64,38 +64,65 @@ func update_coins():
 
 # --- Ajoute une pièce ---
 func add_coin(amount: int = 1) -> void:
+	if has_won: # ✅ on ne peut plus ramasser ni déclencher de victoire après la fin
+		return
 	coins += amount
 	update_coins()
-	
-	if coins > 2:
-		win_game()  # Nouvelle fonction pour gagner
+	if coins > 14:
+		win_game()
 
 # --- Fonction victoire ---
 func win_game():
+	if has_won: # ✅ empêche plusieurs appels
+		return
+	has_won = true # ✅ marquer la victoire
+
 	var victory_label = $\"../CanvasLayer2/VictoryLabel\"
 	victory_label.text = \"Bravo ! Vous avez gagné !\"
 	victory_label.visible = true
+
+	# Musique victoire
 	$AudioStreamPlayer2D6.play()
 	$\"../AudioStreamPlayer2D\".stop()
 	$\"../AudioStreamPlayer2D2\".stop()
 	$\"../AudioStreamPlayer2D3\".stop()
 	$\"../AudioStreamPlayer2D4\".stop()
-	
-	# Bloquer le mouvement horizontal
+
+	# Bloquer tout mouvement
 	can_move = false
-	
-	$AnimatedSprite2D.play(\"repos\")
 	velocity.x = 0
 	etat_courant = Etat.REPOS
+	$AnimatedSprite2D.play(\"repos\")
 
-	# Après 3 secondes, revenir à l'écran d'accueil
+	await get_tree().create_timer(5.0).timeout
+	get_tree().reload_current_scene()
+
+# --- Fonction défaite ---
+func lose_game():
+	if has_won: # ✅ ne peut pas perdre après victoire
+		return
+
+	var victory_label = $\"../CanvasLayer2/VictoryLabel\"
+	victory_label.text = \"Vous avez perdu !\"
+	victory_label.visible = true
+
+	# Musique de défaite
+	$AudioStreamPlayer2D5.play()
+	$\"../AudioStreamPlayer2D\".stop()
+	$\"../AudioStreamPlayer2D2\".stop()
+	$\"../AudioStreamPlayer2D3\".stop()
+	$\"../AudioStreamPlayer2D4\".stop()
+
+	# Bloquer tout mouvement
+	can_move = false
+	velocity.x = 0
+
 	await get_tree().create_timer(5.0).timeout
 	get_tree().reload_current_scene()
 
 # --- Physique et états ---
 func _physics_process(delta: float) -> void:
 	if not can_move:
-		# Applique juste la gravité si le joueur ne peut plus bouger
 		velocity += get_gravity() * delta
 		move_and_slide()
 		return
@@ -168,17 +195,19 @@ func _physics_process(delta: float) -> void:
 			else:
 				velocity.y = 600
 
-	# --- Flip ---
 	$AnimatedSprite2D.flip_h = velocity.x < 0
-
 	move_and_slide()
 
 # --- Mort dans le trou ---
 func _on_area_2d_body_entered(body: Node2D) -> void:
+	if has_won: # ✅ empêche de mourir après victoire
+		return
 	if body == self:
 		_die_and_reset()
 
 func _die_and_reset() -> void:
+	if has_won: # ✅ empêche de mourir après victoire
+		return
 	etat_courant = Etat.MORT
 	var knock_dir = sign(global_position.x - start_position.x)
 	if knock_dir == 0:
@@ -192,9 +221,12 @@ func _die_and_reset() -> void:
 	hp -= 1
 	update_hearts()
 	await get_tree().create_timer(1.0).timeout
+
 	if hp <= 0:
-		hp = max_hp
-		update_hearts()
+		lose_game()
+		return
+
+	hp = max(hp, 0)
 	global_position = start_position
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
@@ -203,6 +235,8 @@ func _die_and_reset() -> void:
 
 # --- Mort par ennemi ---
 func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
+	if has_won: # ✅ empêche de mourir après victoire
+		return
 	if has_died:
 		return
 	has_died = true
@@ -219,9 +253,12 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	$AudioStreamPlayer2D2.play()
 	await get_tree().create_timer(1.0).timeout
 	has_died = false
+
 	if hp <= 0:
-		hp = max_hp
-		update_hearts()
+		lose_game()
+		return
+
+	hp = max(hp, 0)
 	global_position = start_position
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
@@ -232,6 +269,8 @@ func apply_spring_force(force: Vector2) -> void:
 	velocity.y = force.y
 
 func _on_area_2d_2_body_entered(body: Node2D) -> void:
+	if has_won: # ✅ empêche la mort après victoire
+		return
 	if body.has_method(\"_die_hit_and_reset\"):
 		body._die_hit_and_reset(global_position)
 "
@@ -394,7 +433,7 @@ animations = [{
 "duration": 1.1,
 "texture": SubResource("AtlasTexture_l3uw5")
 }, {
-"duration": 1.7,
+"duration": 12.05,
 "texture": SubResource("AtlasTexture_cv775")
 }],
 "loop": false,
@@ -411,7 +450,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_kul21")
 }, {
-"duration": 4.3,
+"duration": 107.2,
 "texture": SubResource("AtlasTexture_bn7gp")
 }],
 "loop": true,
@@ -454,7 +493,7 @@ modulate = Color(1, 0.66, 0.66, 1)
 position = Vector2(293, 437)
 scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"acroupir"
+animation = &"meurt"
 speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

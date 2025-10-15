@@ -12,7 +12,7 @@
 ### Les flèches fonctionne aussi pour les mouvements
 
 ## But
-Rammasser toutes les pieces sans perdre ses trois vies pour gagner le niveau
+Rammasser toutes les pieces sans perdre ses trois vies pour gagner le niveau. Il est possible de tuer les zombies en sautant sur leur tête pour avoir moin d'obstacle en chemain.
 
 ## Obstacles à éviter
 ### Zombie

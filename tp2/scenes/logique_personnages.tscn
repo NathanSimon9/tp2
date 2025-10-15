@@ -28,7 +28,7 @@ var etat_courant := Etat.REPOS
 
 # --- Vie ---
 var has_died := false
-var has_won := false # ✅ empêche de mourir après victoire
+var has_won := false 
 var max_hp := 3
 var hp := max_hp
 @onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()

@@ -3,7 +3,7 @@ extends Control
 func _ready() -> void:
 	$CanvasLayer/CenterContainer/AnimationPlayer.play("RESET")
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	testEsc()
 
 func resume() -> void:
@@ -30,6 +30,3 @@ func _on_recommencer_pressed() -> void:
 
 func _on_quitter_pressed() -> void:
 	get_tree().quit()
-
-func _on_pause_pressed() -> void:
-	get_tree().paused

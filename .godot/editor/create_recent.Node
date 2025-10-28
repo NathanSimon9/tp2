@@ -1,0 +1,14 @@
+TextureRect
+HBoxContainer
+CanvasLayer
+CollisionShape2D
+Area2D
+Node2D
+CharacterBody2D
+CPUParticles2D
+AnimationPlayer
+Timer
+RigidBody2D
+Marker2D
+RayCast2D
+VisibleOnScreenEnabler2D

@@ -1,0 +1,5 @@
+res://scenes/main.tscn
+res://scenes/jeux_demo.tscn
+res://scenes/logique_personnages.tscn
+res://scenes/enemy.tscn
+res://scenes/bullet.tscn

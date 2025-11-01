@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=4 uid="uid://bryempit8ffdx"]
+[gd_scene load_steps=36 format=4 uid="uid://bryempit8ffdx"]
 
 [ext_resource type="Texture2D" uid="uid://jjtiemfhppyw" path="res://medias/Backgrounds/backgroundEmpty.png" id="1_j1d38"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_j5833"]
@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" uid="uid://c1c7xqnnqgo8g" path="res://scenes/moving_platform.tscn" id="25_o5ck2"]
 [ext_resource type="PackedScene" uid="uid://da0ijhfbphia" path="res://scenes/pause_menu.tscn" id="26_7mjfh"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7mjfh"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_j68o2"]
 texture = ExtResource("1_j5833")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
@@ -462,6 +462,8 @@ texture_region_size = Vector2i(64, 64)
 9:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 10:11/0 = 0
 11:11/0 = 0
+11:11/0/physics_layer_0/linear_velocity = Vector2(64, 64)
+11:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 12:11/0 = 0
 13:11/0 = 0
 14:11/0 = 0
@@ -485,6 +487,8 @@ texture_region_size = Vector2i(64, 64)
 9:12/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 10:12/0 = 0
 11:12/0 = 0
+11:12/0/physics_layer_0/linear_velocity = Vector2(64, 64)
+11:12/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 12:12/0 = 0
 13:12/0 = 0
 14:12/0 = 0
@@ -650,7 +654,7 @@ texture_region_size = Vector2i(64, 64)
 [sub_resource type="TileSet" id="TileSet_y6j1f"]
 tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
-sources/1 = SubResource("TileSetAtlasSource_7mjfh")
+sources/1 = SubResource("TileSetAtlasSource_j68o2")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_moo7p"]
 size = Vector2(645, 218)
@@ -672,67 +676,6 @@ size = Vector2(5, 50.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mvy5s"]
 size = Vector2(56, 31)
-
-[sub_resource type="Animation" id="Animation_7mjfh"]
-resource_name = "new_animation"
-length = 1.7175
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("ColorRect:color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0.0666667, 1.31),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(0, 0, 0, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("ColorRect:self_modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1.33),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(0, 0, 0, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_gp3mn"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("ColorRect:color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("ColorRect:self_modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_mvy5s"]
-_data = {
-&"RESET": SubResource("Animation_gp3mn"),
-&"new_animation": SubResource("Animation_7mjfh")
-}
 
 [node name="jeux" type="Node2D"]
 process_mode = 1
@@ -1204,23 +1147,18 @@ theme_override_constants/shadow_outline_size = 24
 theme_override_font_sizes/font_size = 90
 text = "FÉLICITATION  !!!!!!"
 
+[node name="FadeRect" type="ColorRect" parent="CanvasLayer2"]
+offset_left = -1894.0
+offset_top = -1804.0
+offset_right = 6988.0
+offset_bottom = 2278.0
+color = Color(0, 0, 0, 0)
+
 [node name="porte" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="porte"]
 position = Vector2(5910, 324)
 shape = SubResource("RectangleShape2D_mvy5s")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_mvy5s")
-}
-
-[node name="ColorRect" type="ColorRect" parent="."]
-self_modulate = Color(1, 1, 1, 0)
-offset_left = -4536.0
-offset_top = -5720.0
-offset_right = 8642.0
-offset_bottom = 3919.0
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="Area2D2" to="personnages" method="_on_area_2d_2_body_entered"]

@@ -72,7 +72,7 @@ func add_coin(amount: int = 1) -> void:
 		return
 	coins += amount
 	update_coins()
-	if coins > 2:
+	if coins > 14:
 		win_game()
 
 # --- Fonction victoire ---
@@ -80,16 +80,7 @@ func win_game():
 	if has_won:
 		return
 	has_won = true
-	$\"../CanvasLayer2/VictoryLabel\".visible = true
-	$\"../AnimationPlayer\".play(\"new_animation\")
-
-# On connecte le signal à une fonction
-	$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
-
-# Fonction appelée quand l'animation se termine
-func _on_animation_finished(anim_name: String) -> void:
-	if anim_name == \"new_animation\":  # On vérifie que c'est bien notre animation
-		get_tree().change_scene_to_file(\"res://scenes/boss.tscn\")
+	get_tree().change_scene_to_file(\"res://scenes/boss.tscn\")
 
 	# Musique victoire
 	$AudioStreamPlayer2D6.play()

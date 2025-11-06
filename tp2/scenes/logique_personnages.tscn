@@ -23,7 +23,7 @@ const BOOST_SPEED := 400.0
 const JUMP_VELOCITY := -500.0
 
 # --- États ---
-enum Etat { COURIR, MARCHE, REPOS, SAUT, MORT, ACROUPIR }
+enum Etat { COURIR, MARCHE, REPOS, SAUT, TOMBER, MORT, ACROUPIR }
 var etat_courant := Etat.REPOS
 
 # --- Vie ---
@@ -72,7 +72,7 @@ func add_coin(amount: int = 1) -> void:
 		return
 	coins += amount
 	update_coins()
-	if coins > 2:
+	if coins > 14:
 		win_game()
 
 # --- Fonction victoire ---
@@ -89,7 +89,7 @@ func win_game():
 # Fonction appelée quand l'animation se termine
 func _on_animation_finished(anim_name: String) -> void:
 	if anim_name == \"new_animation\":  # On vérifie que c'est bien notre animation
-		get_tree().change_scene_to_file(\"res://scenes/boss.tscn\")
+		get_tree().change_scene_to_file(\"res://scenes/niveau_2.tscn\")
 
 	# Musique victoire
 	$AudioStreamPlayer2D6.play()
@@ -103,8 +103,6 @@ func _on_animation_finished(anim_name: String) -> void:
 	etat_courant = Etat.REPOS
 	$AnimatedSprite2D.play(\"repos\")
 
-	await get_tree().create_timer(5.0).timeout
-	get_tree().reload_current_scene()
 
 # --- Fonction défaite ---
 func lose_game():
@@ -161,8 +159,13 @@ func _physics_process(delta: float) -> void:
 
 	# --- En l'air ---
 	if not is_on_floor():
-		etat_courant = Etat.SAUT
-		$AnimatedSprite2D.play(\"sauter\")
+		# Différencier saut (montée) et chute (descente)
+		if velocity.y < 0:
+			etat_courant = Etat.SAUT
+			$AnimatedSprite2D.play(\"sauter\")
+		else:
+			etat_courant = Etat.TOMBER
+			$AnimatedSprite2D.play(\"tomber\")
 
 		# Le personnage garde la même vitesse selon le mode de déplacement
 		if is_sprinting:
@@ -501,6 +504,14 @@ animations = [{
 "loop": false,
 "name": &"sauter",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 10000.0,
+"texture": SubResource("AtlasTexture_3hj08")
+}],
+"loop": true,
+"name": &"tomber",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7sgir"]
@@ -516,7 +527,7 @@ modulate = Color(1, 0.66, 0.66, 1)
 position = Vector2(293, 437)
 scale = Vector2(0.404526, 0.404527)
 sprite_frames = SubResource("SpriteFrames_kyng0")
-animation = &"meurt"
+animation = &"tomber"
 speed_scale = 1.235
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

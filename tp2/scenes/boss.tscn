@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cy1jgaai4p8pj" path="res://medias/coeur.png" id="4_r3bxh"]
 [ext_resource type="Texture2D" uid="uid://dnx8hi2qxag2n" path="res://medias/currency-coin-cartoon-png.png" id="5_wqpjq"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jncid"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_r3bxh"]
 texture = ExtResource("2_neq0i")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
@@ -612,7 +612,7 @@ texture_region_size = Vector2i(64, 64)
 [sub_resource type="TileSet" id="TileSet_qnbj4"]
 tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
-sources/1 = SubResource("TileSetAtlasSource_jncid")
+sources/1 = SubResource("TileSetAtlasSource_r3bxh")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r3bxh"]
 size = Vector2(2675.5, 928.5)

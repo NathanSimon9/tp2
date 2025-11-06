@@ -229,15 +229,18 @@ func _physics_process(delta: float) -> void:
 
 # --- Mort dans le trou ---
 func _on_area_2d_body_entered(body: Node2D) -> void:
-	if has_won:
+	if has_won or has_died:  # AJOUT: vérification de has_died
 		return
 	if body == self:
 		_die_and_reset()
 
 func _die_and_reset() -> void:
-	if has_won:
+	if has_won or has_died:  # AJOUT: vérification de has_died
 		return
+	
+	has_died = true  # DÉPLACÉ: on marque comme mort dès le début
 	etat_courant = Etat.MORT
+	
 	var knock_dir = sign(global_position.x - start_position.x)
 	if knock_dir == 0:
 		knock_dir = 1
@@ -261,13 +264,13 @@ func _die_and_reset() -> void:
 	$AnimatedSprite2D.play(\"repos\")
 	etat_courant = Etat.REPOS
 	velocity = Vector2.ZERO
+	has_died = false  # On réinitialise le flag après la résurrection
 
 # --- Mort par ennemi ---
 func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
-	if has_won:
+	if has_won or has_died:  # AJOUT: vérification de has_died
 		return
-	if has_died:
-		return
+	
 	has_died = true
 	hp -= 1
 	update_hearts()
@@ -281,7 +284,6 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	$AnimatedSprite2D.play(\"meurt_frapper\")
 	$AudioStreamPlayer2D2.play()
 	await get_tree().create_timer(1.0).timeout
-	has_died = false
 
 	if hp <= 0:
 		lose_game()
@@ -293,6 +295,7 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	$AnimatedSprite2D.play(\"repos\")
 	etat_courant = Etat.REPOS
 	velocity = Vector2.ZERO
+	has_died = false
 
 func apply_spring_force(force: Vector2) -> void:
 	velocity.y = force.y
@@ -303,14 +306,9 @@ func _on_area_2d_2_body_entered(body: Node2D) -> void:
 	if body.has_method(\"_die_hit_and_reset\"):
 		body._die_hit_and_reset(global_position)
 
-
 func _on_boss_body_entered(body: Node2D) -> void:
 	$\"../AnimationPlayer\".play(\"RESET\")
 	$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
-	
-
-	
-	
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3lvrx"]

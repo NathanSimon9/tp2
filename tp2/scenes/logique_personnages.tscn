@@ -91,6 +91,8 @@ func win_game():
 func _on_animation_finished(anim_name: String) -> void:
 	if anim_name == \"new_animation\":  # On vérifie que c'est bien notre animation
 		get_tree().change_scene_to_file(\"res://scenes/niveau_2.tscn\")
+	if anim_name == \"RESET\":
+		get_tree().change_scene_to_file(\"res://scenes/boss.tscn\")
 
 	# Musique victoire
 	$AudioStreamPlayer2D6.play()
@@ -303,7 +305,9 @@ func _on_area_2d_2_body_entered(body: Node2D) -> void:
 
 
 func _on_boss_body_entered(body: Node2D) -> void:
-	$\"../AnimationPlayer\".play(\"new_animation\")
+	$\"../AnimationPlayer\".play(\"RESET\")
+	$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
+	
 
 	
 	

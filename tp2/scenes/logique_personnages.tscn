@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://3uog7aftmdeu"]
+[gd_scene load_steps=44 format=3 uid="uid://3uog7aftmdeu"]
 
 [ext_resource type="Texture2D" uid="uid://c2raopp0p6tsp" path="res://medias/acroupir.png" id="1_7sgir"]
 [ext_resource type="Texture2D" uid="uid://b6yhw8as2t8w2" path="res://medias/sprites-1.png" id="1_s3281"]
@@ -32,31 +32,43 @@ var has_died := false
 var has_won := false 
 var max_hp := 3
 var hp := max_hp
-@onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()
+@onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children() if has_node(\"../CanvasLayer/HBoxContainer\") else []
 
 # --- Pièces ---
 var coins := 0
-@onready var coin_label := $\"../CanvasLayer/CoinCounter/Label\"
+@onready var coin_label := $\"../CanvasLayer/CoinCounter/Label\" if has_node(\"../CanvasLayer/CoinCounter/Label\") else null
 
 # --- Position de départ ---
 var start_position := Vector2.ZERO
 
 # --- Mouvement autorisé ---
-var can_move := true  # bloque le mouvement du joueur après victoire ou défaite
+var can_move := true
 
 # --- Direction mémorisée ---
-var desired_direction := 0  # direction voulue par le joueur
-var is_sprinting := false   # indique si le joueur sprintait avant le saut
+var desired_direction := 0
+var is_sprinting := false
 
 func _ready() -> void:
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()
 	update_coins()
-	$\"../CanvasLayer2/VictoryLabel\".visible = false
+	if has_node(\"../CanvasLayer2/VictoryLabel\"):
+		$\"../CanvasLayer2/VictoryLabel\".visible = false
+	
+	# Connecte l'attaque si l'Area2D existe
+	if has_node(\"Attackarea\"):
+		$Attackarea.body_entered.connect(_on_attack_area_body_entered)
+
+	# --- CONNEXION AU HITBOX DU BOSS ---
+	var boss = get_tree().get_root().get_node(\"CheminVersBoss\") # Remplace par le vrai chemin de ton boss
+	if boss and boss.has_node(\"HitBoxBody\"):
+		boss.HitBoxBody.body_entered.connect(_on_boss_hitbox_body_entered)
 
 # --- Mets à jour les cœurs ---
 func update_hearts():
+	if hearts.size() == 0:
+		return
 	for i in range(len(hearts)):
 		if i < hp:
 			hearts[i].texture = preload(\"res://medias/coeur.png\")
@@ -65,7 +77,8 @@ func update_hearts():
 
 # --- Mets à jour les pièces ---
 func update_coins():
-	coin_label.text = str(coins)
+	if coin_label:
+		coin_label.text = str(coins)
 
 # --- Ajoute une pièce ---
 func add_coin(amount: int = 1) -> void:
@@ -81,47 +94,57 @@ func win_game():
 	if has_won:
 		return
 	has_won = true
-	$\"../CanvasLayer2/VictoryLabel\".visible = true
-	$\"../AnimationPlayer\".play(\"new_animation\")
+	if has_node(\"../CanvasLayer2/VictoryLabel\"):
+		$\"../CanvasLayer2/VictoryLabel\".visible = true
+	if has_node(\"../AnimationPlayer\"):
+		$\"../AnimationPlayer\".play(\"new_animation\")
+		$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
 
-# On connecte le signal à une fonction
-	$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
-
-# Fonction appelée quand l'animation se termine
+# --- Fonction appelée quand l'animation se termine ---
 func _on_animation_finished(anim_name: String) -> void:
-	if anim_name == \"new_animation\":  # On vérifie que c'est bien notre animation
+	if anim_name == \"new_animation\":
 		get_tree().change_scene_to_file(\"res://scenes/niveau_2.tscn\")
 	if anim_name == \"RESET\":
 		get_tree().change_scene_to_file(\"res://scenes/boss.tscn\")
 
 	# Musique victoire
-	$AudioStreamPlayer2D6.play()
-	$\"../AudioStreamPlayer2D\".stop()
-	$\"../AudioStreamPlayer2D2\".stop()
-	$\"../AudioStreamPlayer2D3\".stop()
-	$\"../AudioStreamPlayer2D4\".stop()
+	if has_node(\"AudioStreamPlayer2D6\"):
+		$AudioStreamPlayer2D6.play()
+	if has_node(\"../AudioStreamPlayer2D\"):
+		$\"../AudioStreamPlayer2D\".stop()
+	if has_node(\"../AudioStreamPlayer2D2\"):
+		$\"../AudioStreamPlayer2D2\".stop()
+	if has_node(\"../AudioStreamPlayer2D3\"):
+		$\"../AudioStreamPlayer2D3\".stop()
+	if has_node(\"../AudioStreamPlayer2D4\"):
+		$\"../AudioStreamPlayer2D4\".stop()
 
 	can_move = false
 	velocity.x = 0
 	etat_courant = Etat.REPOS
 	$AnimatedSprite2D.play(\"repos\")
 
-
 # --- Fonction défaite ---
 func lose_game():
 	if has_won:
 		return
 
-	var victory_label = $\"../CanvasLayer2/VictoryLabel\"
-	victory_label.text = \"Vous avez perdu !\"
-	victory_label.visible = true
+	if has_node(\"../CanvasLayer2/VictoryLabel\"):
+		var victory_label = $\"../CanvasLayer2/VictoryLabel\"
+		victory_label.text = \"Vous avez perdu !\"
+		victory_label.visible = true
 
 	# Musique de défaite
-	$AudioStreamPlayer2D5.play()
-	$\"../AudioStreamPlayer2D\".stop()
-	$\"../AudioStreamPlayer2D2\".stop()
-	$\"../AudioStreamPlayer2D3\".stop()
-	$\"../AudioStreamPlayer2D4\".stop()
+	if has_node(\"AudioStreamPlayer2D5\"):
+		$AudioStreamPlayer2D5.play()
+	if has_node(\"../AudioStreamPlayer2D\"):
+		$\"../AudioStreamPlayer2D\".stop()
+	if has_node(\"../AudioStreamPlayer2D2\"):
+		$\"../AudioStreamPlayer2D2\".stop()
+	if has_node(\"../AudioStreamPlayer2D3\"):
+		$\"../AudioStreamPlayer2D3\".stop()
+	if has_node(\"../AudioStreamPlayer2D4\"):
+		$\"../AudioStreamPlayer2D4\".stop()
 
 	can_move = false
 	velocity.x = 0
@@ -140,29 +163,23 @@ func _physics_process(delta: float) -> void:
 	var pressing_bas := Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or Input.is_action_pressed(\"bas\")
 	var sprint_pressed := Input.is_key_pressed(KEY_SHIFT)
 
-	# --- Mémorisation de la direction et du sprint ---
 	if input_direction != 0:
 		desired_direction = input_direction
 	elif not Input.is_action_pressed(\"marche\") and not Input.is_action_pressed(\"marche_arriere\"):
 		desired_direction = 0
 
-	# Si le joueur court actuellement, on note qu'il sprint
 	if sprint_pressed and desired_direction != 0:
 		is_sprinting = true
 	elif not sprint_pressed:
 		is_sprinting = false
 
-	# --- Gravité ---
 	velocity += get_gravity() * delta
 
-	# --- État mort ---
 	if etat_courant == Etat.MORT:
 		move_and_slide()
 		return
 
-	# --- En l'air ---
 	if not is_on_floor():
-		# Différencier saut (montée) et chute (descente)
 		if velocity.y < 0:
 			etat_courant = Etat.SAUT
 			$AnimatedSprite2D.play(\"sauter\")
@@ -170,7 +187,6 @@ func _physics_process(delta: float) -> void:
 			etat_courant = Etat.TOMBER
 			$AnimatedSprite2D.play(\"tomber\")
 
-		# Le personnage garde la même vitesse selon le mode de déplacement
 		if is_sprinting:
 			velocity.x = desired_direction * BOOST_SPEED
 		else:
@@ -181,9 +197,7 @@ func _physics_process(delta: float) -> void:
 
 		if Input.is_action_just_pressed(\"sauter\") and is_on_floor():
 			velocity.y = JUMP_VELOCITY
-
 	else:
-		# --- États au sol ---
 		var direction = desired_direction
 
 		if pressing_bas:
@@ -200,23 +214,23 @@ func _physics_process(delta: float) -> void:
 				$AnimatedSprite2D.play(\"repos\")
 				velocity.x = 0
 				if Input.is_action_just_pressed(\"sauter\"):
-					$AudioStreamPlayer2D.play()
+					if has_node(\"AudioStreamPlayer2D\"):
+						$AudioStreamPlayer2D.play()
 					velocity.y = JUMP_VELOCITY
-
 			Etat.MARCHE:
 				$AnimatedSprite2D.play(\"marcher\")
 				velocity.x = direction * SPEED
 				if Input.is_action_just_pressed(\"sauter\"):
-					$AudioStreamPlayer2D.play()
+					if has_node(\"AudioStreamPlayer2D\"):
+						$AudioStreamPlayer2D.play()
 					velocity.y = JUMP_VELOCITY
-
 			Etat.COURIR:
 				$AnimatedSprite2D.play(\"courire\")
 				velocity.x = direction * BOOST_SPEED
 				if Input.is_action_just_pressed(\"sauter\"):
-					$AudioStreamPlayer2D.play()
+					if has_node(\"AudioStreamPlayer2D\"):
+						$AudioStreamPlayer2D.play()
 					velocity.y = JUMP_VELOCITY
-
 			Etat.ACROUPIR:
 				$AnimatedSprite2D.play(\"acroupir\")
 				if is_on_floor():
@@ -227,50 +241,50 @@ func _physics_process(delta: float) -> void:
 	$AnimatedSprite2D.flip_h = velocity.x < 0
 	move_and_slide()
 
+# --- Attaque en sautant sur ennemis ---
+func _on_attack_area_body_entered(body: Node2D) -> void:
+	if body.has_method(\"take_damage\") and velocity.y > 0:
+		body.take_damage(50)
+		velocity.y = -400
+		if has_node(\"AudioStreamPlayer2D\"):
+			$AudioStreamPlayer2D.play()
+
 # --- Mort dans le trou ---
 func _on_area_2d_body_entered(body: Node2D) -> void:
-	if has_won or has_died:  # AJOUT: vérification de has_died
+	if has_won or has_died:
 		return
 	if body == self:
 		_die_and_reset()
 
 func _die_and_reset() -> void:
-	if has_won or has_died:  # AJOUT: vérification de has_died
+	if has_won or has_died:
 		return
-	
-	has_died = true  # DÉPLACÉ: on marque comme mort dès le début
+	has_died = true
 	etat_courant = Etat.MORT
-	
-	var knock_dir = sign(global_position.x - start_position.x)
-	if knock_dir == 0:
-		knock_dir = 1
-	velocity.x = 100 * knock_dir
-	velocity.y = 0
 	$AnimatedSprite2D.play(\"meurt\")
-	$AudioStreamPlayer2D5.play()
-	$AudioStreamPlayer2D3.play()
-	$AnimatedSprite2D.modulate = Color(1,1,1,0.5)
+	await get_tree().create_timer(1.0).timeout
 	hp -= 1
 	update_hearts()
-	await get_tree().create_timer(1.0).timeout
-
 	if hp <= 0:
 		lose_game()
 		return
-
-	hp = max(hp, 0)
 	global_position = start_position
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
 	etat_courant = Etat.REPOS
 	velocity = Vector2.ZERO
-	has_died = false  # On réinitialise le flag après la résurrection
+	has_died = false
 
-# --- Mort par ennemi ---
+# --- Mort par le boss HitBoxBody ---
+func _on_boss_hitbox_body_entered(body: Node) -> void:
+	if body == self:
+		print(\"Touché par le boss !\")
+		_die_hit_and_reset(global_position)
+
+# --- Mort par un ennemi ---
 func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
-	if has_won or has_died:  # AJOUT: vérification de has_died
+	if has_won or has_died:
 		return
-	
 	has_died = true
 	hp -= 1
 	update_hearts()
@@ -282,33 +296,20 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 	velocity.y = -200
 	$AnimatedSprite2D.modulate = Color(1,0.5,0.5,1)
 	$AnimatedSprite2D.play(\"meurt_frapper\")
-	$AudioStreamPlayer2D2.play()
+	if has_node(\"AudioStreamPlayer2D2\"):
+		$AudioStreamPlayer2D2.play()
 	await get_tree().create_timer(1.0).timeout
 
 	if hp <= 0:
 		lose_game()
 		return
 
-	hp = max(hp, 0)
 	global_position = start_position
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
 	etat_courant = Etat.REPOS
 	velocity = Vector2.ZERO
 	has_died = false
-
-func apply_spring_force(force: Vector2) -> void:
-	velocity.y = force.y
-
-func _on_area_2d_2_body_entered(body: Node2D) -> void:
-	if has_won:
-		return
-	if body.has_method(\"_die_hit_and_reset\"):
-		body._die_hit_and_reset(global_position)
-
-func _on_boss_body_entered(body: Node2D) -> void:
-	$\"../AnimationPlayer\".play(\"RESET\")
-	$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3lvrx"]
@@ -538,6 +539,9 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7sgir"]
 size = Vector2(44, 89.625)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0hakg"]
+size = Vector2(44, 12)
+
 [node name="personnages" type="CharacterBody2D" groups=["player"]]
 collision_layer = 3
 collision_mask = 3
@@ -591,3 +595,9 @@ volume_db = 2.811
 
 [node name="AudioStreamPlayer2D6" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("13_gos7e")
+
+[node name="Attackarea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Attackarea"]
+position = Vector2(296, 494)
+shape = SubResource("RectangleShape2D_0hakg")

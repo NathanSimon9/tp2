@@ -903,7 +903,7 @@ tile_map_data = PackedByteArray("AAD6/wUAAQAHAA8AAAD7/wUAAQAHAA8AAAD8/wUAAQAHAA8
 tile_set = SubResource("TileSet_y6j1f")
 
 [node name="personnages" parent="." instance=ExtResource("2_3v0hw")]
-position = Vector2(-514, -132)
+position = Vector2(-214, 241)
 
 [node name="Area2D" type="Area2D" parent="." groups=["death_area", "player"]]
 modulate = Color(0.207843, 1, 1, 1)
@@ -1169,6 +1169,10 @@ position = Vector2(5767, 374)
 message = "RAMASSER TOUTE LES PIÈCES"
 
 [node name="PauseMenu" parent="." instance=ExtResource("26_7mjfh")]
+offset_left = 1.0
+offset_top = -3.0
+offset_right = 1.0
+offset_bottom = -3.0
 scale = Vector2(24.4, 18.6079)
 
 [node name="affiche3" parent="." groups=["panneaux"] instance=ExtResource("23_7vxg6")]
@@ -1176,14 +1180,14 @@ position = Vector2(264, 374)
 message = "\"BACKSPACE\" pour dévoiler le menu pause"
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(176, 352)
+position = Vector2(167, 375)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(-30, 15)
+position = Vector2(-20, -9)
 shape = SubResource("RectangleShape2D_gp3mn")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(29, 16)
+position = Vector2(37, -9)
 shape = SubResource("RectangleShape2D_gp3mn")
 
 [node name="CanvasLayer2" type="CanvasLayer" parent="."]
@@ -1194,10 +1198,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -248.5
-offset_top = -39.0
-offset_right = 248.5
-offset_bottom = 39.0
+offset_left = -386.0
+offset_top = -65.0
+offset_right = 398.0
+offset_bottom = 59.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 0.246433, 0.701242, 1)
@@ -1223,10 +1227,10 @@ libraries = {
 
 [node name="ColorRect" type="ColorRect" parent="."]
 self_modulate = Color(1, 1, 1, 0)
-offset_left = -4536.0
-offset_top = -5720.0
-offset_right = 8642.0
-offset_bottom = 3919.0
+offset_left = -4213.0
+offset_top = -3518.0
+offset_right = 8965.0
+offset_bottom = 6121.0
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="Area2D2" to="personnages" method="_on_area_2d_2_body_entered"]

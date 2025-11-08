@@ -148,33 +148,16 @@ animations = [{
 size = Vector2(111.5, 192.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_erslg"]
-size = Vector2(132, 20)
+size = Vector2(111, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dxj81"]
-size = Vector2(1126, 422)
+size = Vector2(1530, 422)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bp821"]
 size = Vector2(133, 197)
 
 [node name="Boss" type="CharacterBody2D"]
 script = ExtResource("1_mxnp2")
-walk_speed = null
-chase_speed = null
-jump_force = null
-gravity = null
-max_hp = null
-flee_duration = null
-flee_speed = null
-enrage_threshold = null
-dash_attack_speed = null
-dash_attack_cooldown = null
-dash_attack_duration = null
-spawn_min_y = null
-spawn_max_y = null
-summon_cooldown = null
-summon_attempts = null
-spawn_min_distance_from_boss = null
-random_walk_time = null
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -63)
@@ -190,7 +173,7 @@ shape = SubResource("RectangleShape2D_8cxno")
 [node name="HitHead" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitHead"]
-position = Vector2(0, -129)
+position = Vector2(-0.5, -125)
 shape = SubResource("RectangleShape2D_erslg")
 
 [node name="RayGround" type="RayCast2D" parent="."]
@@ -203,7 +186,7 @@ target_position = Vector2(102, 0)
 [node name="Detection" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Detection"]
-position = Vector2(0, -23)
+position = Vector2(2, -23)
 shape = SubResource("RectangleShape2D_dxj81")
 
 [node name="HitPlayer" type="Area2D" parent="."]

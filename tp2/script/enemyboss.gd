@@ -9,31 +9,31 @@ extends CharacterBody2D
 @export var flee_speed := 700.0
 
 # ===== NOUVELLES FONCTIONNALITÉS =====
-@export var enrage_threshold := 0.3  # 30% de vie = mode rage
+@export var enrage_threshold := 0.3
 @export var dash_attack_speed := 900.0
 @export var dash_attack_cooldown := 5.0
 @export var dash_attack_duration := 0.5
 
 var hp := max_hp
-var state := "idle"   # idle, random_walk, chase, attack, hurt, fleeing, dead, dash_attack, charging
+var state := "idle"
 var player: CharacterBody2D = null
 var hurt := false
 var attacking := false
 var dead := false
-var fleeing_timer := 0.0  # temps restant pour la fuite
+var fleeing_timer := 0.0
 
 # ===== NOUVELLES VARIABLES =====
 var is_enraged := false
 var dash_attack_timer := 0.0
 var dash_timer := 0.0
-var combo_attack_count := 0  # Compteur de combo
+var combo_attack_count := 0
 var last_attack_time := 0.0
-var is_charging := false  # Nouveau: indique si le boss charge son dash
-var can_summon := true  # Peut invoquer des zombies
-var summon_cooldown := 6.0  # Cooldown entre les invocations
+var is_charging := false
+var can_summon := true
+var summon_cooldown := 15.0
 var summon_timer := 0.0
-var enemy_scene = preload("res://scenes/enemy.tscn")  # Charge la scène zombie
-var summoning_active := false  # Le boss est en mode invocation
+var enemy_scene = preload("res://scenes/enemy.tscn")
+var summoning_active := false
 
 @onready var hearts := $"../CanvasLayer/HBoxContainer2".get_children()
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -50,6 +50,10 @@ func _ready():
 	hit_player.body_entered.connect(_on_hit_player)
 	detection_area.body_entered.connect(_on_player_detected)
 	detection_area.body_exited.connect(_on_player_left)
+
+	# ✅ NOUVEAU : le boss détecte les zombies et saute dessus
+	$CollisionShape2D.connect("body_entered", _on_body_entered)
+
 	sprite.play("idle")
 	update_hearts()
 	print("🔥 Boss prêt - Vie: ", hp, "/", max_hp)
@@ -65,11 +69,9 @@ func _physics_process(delta: float):
 	if dead:
 		return
 
-	# Diminue les timers
 	if fleeing_timer > 0:
 		fleeing_timer -= delta
 		if fleeing_timer <= 0:
-			# Fin de la fuite
 			if player != null and is_instance_valid(player):
 				state = "chase"
 			else:
@@ -86,13 +88,11 @@ func _physics_process(delta: float):
 
 	velocity.y += gravity * delta
 
-	# ===== BLOQUER LE MOUVEMENT PENDANT LA CHARGE =====
 	if is_charging:
 		velocity.x = 0
 		move_and_slide()
 		return
 
-	# ===== NOUVELLE LOGIQUE: DASH ATTACK =====
 	if state == "dash_attack":
 		_do_dash_attack_state()
 	elif state == "attack" or state == "hurt":
@@ -115,22 +115,17 @@ func _do_chase_state(delta):
 		return
 
 	var distance = global_position.distance_to(player.global_position)
-	
-	# ===== INVOQUER DES ZOMBIES SI VIE FAIBLE =====
-	# Continue d'invoquer même si des zombies sont déjà présents
+
 	if hp <= 5 and summon_timer <= 0:
 		_summon_zombies()
 		return
 	
-	# ===== NOUVELLE FONCTIONNALITÉ: DASH ATTACK EN RAGE =====
 	if is_enraged and dash_attack_timer <= 0 and distance < 400 and distance > 100:
 		_initiate_dash_attack()
 		return
 
-	# ===== FIX: Zone morte pour éviter l'oscillation =====
 	var horizontal_distance = player.global_position.x - global_position.x
 	
-	# Si le joueur est à moins de 20 pixels horizontalement, ne pas bouger
 	if abs(horizontal_distance) < 20:
 		velocity.x = 0
 		if state != "attack":
@@ -138,8 +133,6 @@ func _do_chase_state(delta):
 	else:
 		var dir = sign(horizontal_distance)
 		sprite.flip_h = dir < 0
-		
-		# ===== VITESSE AUGMENTÉE EN RAGE =====
 		var current_speed = chase_speed * 1.3 if is_enraged else chase_speed
 		velocity.x = dir * current_speed
 		
@@ -175,41 +168,33 @@ func _do_fleeing_state():
 	velocity.x = dir * flee_speed
 	sprite.play("walk")
 
-# ===== NOUVELLE FONCTION: INVOQUER DES ZOMBIES =====
 func _summon_zombies():
-	state = "attack"  # Bloquer le mouvement
+	state = "attack"
 	velocity.x = 0
-	summon_timer = summon_cooldown  # Reset le cooldown
+	summon_timer = summon_cooldown
 	summoning_active = true
 	
 	print("🧟 INVOCATION DE ZOMBIES!")
-	sprite.play("attaque")  # Animation d'invocation
+	sprite.play("attaque")
 	
-	# Clignotement violet (effet magique)
 	for i in range(4):
 		sprite.modulate = Color(1, 0.5, 1)
 		await get_tree().create_timer(0.15).timeout
 		sprite.modulate = Color(1, 1, 1)
 		await get_tree().create_timer(0.15).timeout
 	
-	# Nombre aléatoire de zombies (entre 3 et 6)
-	var zombie_count = randi_range(3, 6)
+	var zombie_count = randi_range(3, 4)
 	print("🧟 Invocation de ", zombie_count, " zombies!")
 	
-	# Spawner les zombies à des positions aléatoires
 	for i in range(zombie_count):
-		# Position aléatoire autour du boss
-		var random_x = randf_range(-250, 250)  # Entre -250 et +250 pixels
-		var random_y = randf_range(-80, 20)    # Légèrement en hauteur ou au sol
+		var random_x = randf_range(-250, 250)
+		var random_y = randf_range(-80, 20)
 		_spawn_zombie(Vector2(random_x, random_y))
-		
-		# Petit délai entre chaque spawn pour l'effet
 		await get_tree().create_timer(0.15).timeout
 	
 	await get_tree().create_timer(0.3).timeout
 	summoning_active = false
 	
-	# Reprendre la poursuite
 	if player != null and is_instance_valid(player):
 		state = "chase"
 	else:
@@ -221,25 +206,24 @@ func _spawn_zombie(offset: Vector2):
 		return
 	
 	var zombie = enemy_scene.instantiate()
-	
-	# Position du zombie (à côté du boss)
 	zombie.global_position = global_position + offset
-	
-	# Ajouter au même parent que le boss (la scène)
+
+	# ✅ AJOUT AUTOMATIQUE DU GROUPE
+	zombie.add_to_group("zombie")
+
 	get_parent().add_child(zombie)
 	
-	# Effet visuel de spawn
 	zombie.modulate = Color(1, 1, 1, 0)
 	var tween = create_tween()
 	tween.tween_property(zombie, "modulate", Color(1, 1, 1, 1), 0.5)
 	
 	print("🧟 Zombie spawné à ", zombie.global_position)
+
 func _initiate_dash_attack():
 	state = "dash_attack"
 	dash_attack_timer = dash_attack_cooldown
-	is_charging = true  # Activer le mode charge
-	
-	# S'arrêter et s'orienter vers le joueur
+	is_charging = true
+
 	velocity.x = 0
 	var dir = sign(player.global_position.x - global_position.x)
 	sprite.flip_h = dir < 0
@@ -247,36 +231,30 @@ func _initiate_dash_attack():
 	
 	print("⚠️ DASH ATTACK EN PRÉPARATION...")
 	
-	# Clignotement rouge pendant 1 seconde (5 fois)
 	for i in range(5):
 		sprite.modulate = Color(1.5, 0.3, 0.3)
 		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1)
 		await get_tree().create_timer(0.1).timeout
 	
-	# Fin de la charge
 	is_charging = false
 	
-	# Vérifier que le joueur existe toujours
 	if player == null or not is_instance_valid(player):
 		state = "random_walk"
 		return
 	
-	# DASH!
 	dash_timer = dash_attack_duration
 	print("💨 DASH ATTACK!")
 	sprite.play("attaque")
 
 func _do_dash_attack_state():
 	if dash_timer <= 0:
-		# Fin du dash
 		if player != null and is_instance_valid(player):
 			state = "chase"
 		else:
 			state = "random_walk"
 		return
 	
-	# Dash vers le joueur
 	var dir = 1 if not sprite.flip_h else -1
 	velocity.x = dir * dash_attack_speed
 
@@ -284,7 +262,6 @@ func _on_hit_player(body):
 	if dead or hurt:
 		return
 	
-	# ===== DASH ATTACK PEUT AUSSI TOUCHER =====
 	if state == "dash_attack":
 		if body.name == "Personnages" and is_instance_valid(body):
 			if body.has_method("_die_hit_and_reset"):
@@ -300,13 +277,11 @@ func _on_hit_player(body):
 		state = "attack"
 		sprite.play("attaque")
 		
-		# ===== SYSTÈME DE COMBO =====
 		var time_since_last = Time.get_ticks_msec() / 1000.0 - last_attack_time
 		if time_since_last < 3.0:
 			combo_attack_count += 1
 			if combo_attack_count >= 3:
 				print("🔥 COMBO x3!")
-				# Attaque plus rapide
 				sprite.speed_scale = 1.5
 		else:
 			combo_attack_count = 1
@@ -346,14 +321,12 @@ func _on_head_hit(body):
 		_take_damage()
 		update_hearts()
 
-		# Propulsion horizontale du joueur
 		var direction = sign(body.global_position.x - global_position.x)
 		if direction == 0:
 			direction = 1
 		body.velocity.x = 800 * direction
 		body.velocity.y = -200
 
-		# Début de la fuite
 		state = "fleeing"
 		fleeing_timer = flee_duration
 
@@ -365,7 +338,6 @@ func _take_damage():
 	state = "hurt"
 	_flash_red()
 	
-	# ===== ENTRER EN MODE RAGE =====
 	if not is_enraged and hp <= max_hp * enrage_threshold:
 		_enter_rage_mode()
 	
@@ -381,19 +353,16 @@ func _take_damage():
 	else:
 		state = "random_walk"
 
-# ===== NOUVELLE FONCTION: MODE RAGE =====
 func _enter_rage_mode():
 	is_enraged = true
 	print("😡 BOSS EN RAGE! Vie critique!")
 	
-	# Effet visuel de rage (pulsation rouge)
 	for i in range(3):
 		sprite.modulate = Color(1.5, 0.5, 0.5)
 		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1)
 		await get_tree().create_timer(0.1).timeout
 	
-	# Le boss devient plus agressif
 	chase_speed *= 1.2
 	flee_speed *= 1.3
 
@@ -410,10 +379,8 @@ func _die():
 	velocity = Vector2.ZERO
 	print("💀 Boss vaincu!")
 	
-	# ===== EFFET DE MORT AMÉLIORÉ =====
 	sprite.play("meurt")
 	
-	# Faire clignoter avant de disparaître
 	for i in range(5):
 		sprite.modulate = Color(1, 1, 1, 0.3)
 		await get_tree().create_timer(0.1).timeout
@@ -437,3 +404,13 @@ func _on_player_left(body):
 		if fleeing_timer <= 0:
 			state = "random_walk"
 			print("❓ Cible perdue...")
+
+# ✅ NOUVELLE FONCTION SANS RIEN BRISER
+# Le boss saute automatiquement par-dessus les zombies invoqués
+func _on_body_entered(body):
+	if dead:
+		return
+
+	if body.is_in_group("zombie") and is_on_floor():
+		velocity.y = jump_force
+		sprite.play("jump") 

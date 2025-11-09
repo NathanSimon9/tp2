@@ -119,8 +119,6 @@ func lose_game():
 	victory_label.visible = true
 
 	$AudioStreamPlayer2D5.play()
-	$\"../AudioStreamPlayer2D\".stop()
-	$\"../AudioStreamPlayer2D2\".stop()
 	$\"../AudioStreamPlayer2D3\".stop()
 	$\"../AudioStreamPlayer2D4\".stop()
 

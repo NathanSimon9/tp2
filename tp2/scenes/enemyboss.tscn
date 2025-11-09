@@ -1,8 +1,19 @@
-[gd_scene load_steps=25 format=3 uid="uid://d2csdfvwi63a1"]
+[gd_scene load_steps=36 format=3 uid="uid://d2csdfvwi63a1"]
 
 [ext_resource type="Script" uid="uid://dk6fy7dtthdqi" path="res://script/enemyboss.gd" id="1_mxnp2"]
 [ext_resource type="Texture2D" uid="uid://dmm2fqpnfyui4" path="res://medias/character_zombie_sheet.png" id="2_bp821"]
 [ext_resource type="Texture2D" uid="uid://d3323ax7y5qm4" path="res://medias/fart00.png" id="3_erslg"]
+[ext_resource type="AudioStream" uid="uid://eufdaahodlqp" path="res://sons/Firefly_audio__giant_zombie_getting_hurt_variation1.wav" id="4_8cxno"]
+[ext_resource type="AudioStream" uid="uid://duw5fdcdalwqd" path="res://sons/Firefly_audio_pouff_variation4.wav" id="5_erslg"]
+[ext_resource type="AudioStream" uid="uid://bbtkjkltadjrn" path="res://sons/Firefly_audio_spawning_effect_variation2.wav" id="6_dxj81"]
+[ext_resource type="AudioStream" uid="uid://b1l6ui07akxx3" path="res://sons/Firefly_audio_zombie_dash_variation1.wav" id="7_qal8p"]
+[ext_resource type="AudioStream" uid="uid://vrutf77llx35" path="res://sons/Firefly_audio_zombie_hitting_variation3.wav" id="8_83hb7"]
+[ext_resource type="AudioStream" uid="uid://bj5qgexlf0nrx" path="res://sons/Firefly_audio_moovi_punching_sound_variation4.wav" id="9_ijs82"]
+[ext_resource type="AudioStream" uid="uid://7amh8po8hcdk" path="res://sons/Firefly_audio_swoosh_variation2.wav" id="10_10ykq"]
+[ext_resource type="AudioStream" uid="uid://cmkwukglqgyvh" path="res://sons/Firefly_audio_rage_charging_variation2.wav" id="11_igf2w"]
+[ext_resource type="AudioStream" uid="uid://cnwnv30r4nnjg" path="res://sons/Firefly_audio_pouff_explosion_variation3.wav" id="12_rsoyd"]
+[ext_resource type="AudioStream" uid="uid://7w4i4u1kgx86" path="res://sons/cartoon-splat-310479.mp3" id="13_sjadb"]
+[ext_resource type="AudioStream" uid="uid://cu07qwj7evn3u" path="res://sons/Firefly_audio_giant_zombie_scream_variation3.wav" id="14_wnyve"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_erslg"]
 atlas = ExtResource("2_bp821")
@@ -197,3 +208,44 @@ collision_mask = 2
 position = Vector2(0, -10)
 scale = Vector2(1, 0.880001)
 shape = SubResource("RectangleShape2D_bp821")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_8cxno")
+pitch_scale = 1.21
+attenuation = 1.27456
+
+[node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_erslg")
+volume_db = 4.685
+pitch_scale = 0.75
+
+[node name="AudioStreamPlayer2D3" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_dxj81")
+
+[node name="AudioStreamPlayer2D4" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_qal8p")
+
+[node name="AudioStreamPlayer2D5" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("8_83hb7")
+volume_db = -7.496
+
+[node name="AudioStreamPlayer2D6" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("9_ijs82")
+
+[node name="AudioStreamPlayer2D7" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("10_10ykq")
+volume_db = 4.685
+pitch_scale = 1.18
+
+[node name="AudioStreamPlayer2D8" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("11_igf2w")
+
+[node name="AudioStreamPlayer2D9" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("12_rsoyd")
+volume_db = 0.937
+
+[node name="AudioStreamPlayer2D10" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("13_sjadb")
+
+[node name="AudioStreamPlayer2D11" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("14_wnyve")

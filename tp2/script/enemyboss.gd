@@ -8,11 +8,15 @@ extends CharacterBody2D
 @export var flee_duration := 2.0
 @export var flee_speed := 700.0
 
-# ===== NOUVELLES FONCTIONNALITÉS =====
-@export var enrage_threshold := 0.3
+# ===== FONCTIONNALITÉS DE BASE =====
+@export var enrage_threshold := 3  # Mode rage à 3 HP
 @export var dash_attack_speed := 900.0
 @export var dash_attack_cooldown := 5.0
 @export var dash_attack_duration := 0.5
+
+# ===== NOUVELLES FONCTIONNALITÉS COOL =====
+@export var rapid_attack_cooldown := 8.0
+@export var rapid_attack_count := 3
 
 var hp := max_hp
 var state := "idle"
@@ -22,18 +26,25 @@ var attacking := false
 var dead := false
 var fleeing_timer := 0.0
 
-# ===== NOUVELLES VARIABLES =====
+# ===== VARIABLES COMBAT =====
 var is_enraged := false
 var dash_attack_timer := 0.0
 var dash_timer := 0.0
 var combo_attack_count := 0
 var last_attack_time := 0.0
 var is_charging := false
+
+# ===== INVOCATION ZOMBIES =====
 var can_summon := true
 var summon_cooldown := 15.0
 var summon_timer := 0.0
 var enemy_scene = preload("res://scenes/enemy.tscn")
 var summoning_active := false
+
+# ===== NOUVELLES CAPACITÉS =====
+var rapid_attack_timer := 0.0
+var is_rapid_attacking := false
+var attack_pattern := 0  # Pour varier les attaques
 
 @onready var hearts := $"../CanvasLayer/HBoxContainer2".get_children()
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -50,13 +61,13 @@ func _ready():
 	hit_player.body_entered.connect(_on_hit_player)
 	detection_area.body_entered.connect(_on_player_detected)
 	detection_area.body_exited.connect(_on_player_left)
-
-	# ✅ NOUVEAU : le boss détecte les zombies et saute dessus
 	$CollisionShape2D.connect("body_entered", _on_body_entered)
 
 	sprite.play("idle")
 	update_hearts()
-	print("🔥 Boss prêt - Vie: ", hp, "/", max_hp)
+	
+	print("🔥 BOSS READY - HP: ", hp, "/", max_hp)
+	print("🎮 Nouvelles capacités : Dash, Attaque Rapide x3, Invocation")
 
 func update_hearts():
 	for i in range(len(hearts)):
@@ -69,13 +80,11 @@ func _physics_process(delta: float):
 	if dead:
 		return
 
+	# Mise à jour des timers
 	if fleeing_timer > 0:
 		fleeing_timer -= delta
 		if fleeing_timer <= 0:
-			if player != null and is_instance_valid(player):
-				state = "chase"
-			else:
-				state = "random_walk"
+			state = "chase" if player != null and is_instance_valid(player) else "random_walk"
 	
 	if dash_attack_timer > 0:
 		dash_attack_timer -= delta
@@ -85,63 +94,80 @@ func _physics_process(delta: float):
 	
 	if summon_timer > 0:
 		summon_timer -= delta
+	
+	if rapid_attack_timer > 0:
+		rapid_attack_timer -= delta
 
+	# Gravité
 	velocity.y += gravity * delta
 
-	if is_charging:
+	# États spéciaux qui bloquent le mouvement horizontal
+	if is_charging or is_rapid_attacking:
 		velocity.x = 0
 		move_and_slide()
 		return
 
-	if state == "dash_attack":
-		_do_dash_attack_state()
-	elif state == "attack" or state == "hurt":
-		velocity.x = 0
-	elif state == "fleeing":
-		_do_fleeing_state()
-	elif state == "chase":
-		_do_chase_state(delta)
-	elif state == "random_walk":
-		_do_random_walk(delta)
+	# Machine à états
+	match state:
+		"rapid_attack":
+			pass  # Géré par la coroutine
+		"dash_attack":
+			_do_dash_attack_state()
+		"attack", "hurt":
+			velocity.x = 0
+		"fleeing":
+			_do_fleeing_state()
+		"chase":
+			_do_chase_state(delta)
+		"random_walk":
+			_do_random_walk(delta)
 
 	move_and_slide()
 
 func _do_chase_state(delta):
-	if fleeing_timer > 0:
-		return
-	if hurt or attacking or player == null or not is_instance_valid(player):
-		player = null
-		state = "random_walk"
+	if fleeing_timer > 0 or hurt or attacking or player == null or not is_instance_valid(player):
+		if player == null or not is_instance_valid(player):
+			player = null
+			state = "random_walk"
 		return
 
 	var distance = global_position.distance_to(player.global_position)
+	var horizontal_distance = player.global_position.x - global_position.x
 
-	if hp <= 5 and summon_timer <= 0:
+	# 🧟 INVOCATION (quand il reste 7 HP ou moins)
+	if hp <= 7 and summon_timer <= 0:
 		_summon_zombies()
 		return
 	
+	# 🔥 ATTAQUE RAPIDE (quand il reste 5 HP ou moins)
+	if hp <= 5 and rapid_attack_timer <= 0 and distance < 150 and is_on_floor():
+		attack_pattern = (attack_pattern + 1) % 3
+		if attack_pattern == 0:  # 1 chance sur 3
+			_initiate_rapid_attack()
+			return
+	
+	# ⚡ DASH ATTACK (seulement en rage)
 	if is_enraged and dash_attack_timer <= 0 and distance < 400 and distance > 100:
 		_initiate_dash_attack()
 		return
 
-	var horizontal_distance = player.global_position.x - global_position.x
-	
+	# Mouvement normal de poursuite
 	if abs(horizontal_distance) < 20:
 		velocity.x = 0
-		if state != "attack":
-			sprite.play("idle")
+		sprite.play("idle" if state != "attack" else sprite.animation)
 	else:
 		var dir = sign(horizontal_distance)
 		sprite.flip_h = dir < 0
-		var current_speed = chase_speed * 1.3 if is_enraged else chase_speed
+		var current_speed = chase_speed * 1.5 if is_enraged else chase_speed
 		velocity.x = dir * current_speed
 		
 		if state != "attack":
 			sprite.play("walk")
 
+	# Saut vers le joueur
 	if player.global_position.y < global_position.y - 40 and is_on_floor():
 		velocity.y = jump_force
-		if state != "attack":
+		if state != "attack" and state != "rapid_attack":
 			sprite.play("jump")
 
 func _do_random_walk(delta: float):
@@ -153,11 +179,9 @@ func _do_random_walk(delta: float):
 	velocity.x = random_direction * walk_speed
 	if velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
-		if state != "attack":
-			sprite.play("walk")
+		sprite.play("walk" if state != "attack" else sprite.animation)
 	else:
-		if state != "attack":
-			sprite.play("idle")
+		sprite.play("idle" if state != "attack" else sprite.animation)
 
 func _do_fleeing_state():
 	if player == null or not is_instance_valid(player):
@@ -166,76 +190,158 @@ func _do_fleeing_state():
 	var dir = sign(global_position.x - player.global_position.x)
 	sprite.flip_h = dir < 0
 	velocity.x = dir * flee_speed
+	
 	sprite.play("walk")
 
-func _summon_zombies():
-	state = "attack"
+# ===== 🔥 NOUVELLE ATTAQUE : RAFALE RAPIDE =====
+func _initiate_rapid_attack():
+	if player == null or not is_instance_valid(player):
+		return
+	
+	state = "rapid_attack"
+	rapid_attack_timer = rapid_attack_cooldown
+	is_rapid_attacking = true
 	velocity.x = 0
-	summon_timer = summon_cooldown
-	summoning_active = true
 	
-	print("🧟 INVOCATION DE ZOMBIES!")
-	sprite.play("attaque")
+	var dir = sign(player.global_position.x - global_position.x)
+	sprite.flip_h = dir < 0
 	
-	for i in range(4):
-		sprite.modulate = Color(1, 0.5, 1)
-		await get_tree().create_timer(0.15).timeout
+	print("🔥 ATTAQUE RAPIDE x3!")
+	
+	# Faire 3 attaques rapides
+	for i in range(rapid_attack_count):
+		if state != "rapid_attack":  # Si interrompu
+			break
+		
+		# Flash rouge avant chaque attaque
+		sprite.modulate = Color(2, 0.3, 0.3)
+		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1)
-		await get_tree().create_timer(0.15).timeout
+		
+		# Attaque
+		sprite.play("attaque")
+		sprite.speed_scale = 2.0  # Attaque ultra rapide
+		
+		# Vérifier si le joueur est touché
+		if player != null and is_instance_valid(player):
+			var distance = global_position.distance_to(player.global_position)
+			if distance < 80:  # Portée d'attaque
+				if player.has_method("_die_hit_and_reset"):
+					player._die_hit_and_reset(global_position)
+					print("💥 Touché! (", i+1, "/", rapid_attack_count, ")")
+		
+		await get_tree().create_timer(0.3).timeout
 	
-	var zombie_count = randi_range(3, 4)
-	print("🧟 Invocation de ", zombie_count, " zombies!")
-	
-	for i in range(zombie_count):
-		var random_x = randf_range(-250, 250)
-		var random_y = randf_range(-80, 20)
-		_spawn_zombie(Vector2(random_x, random_y))
-		await get_tree().create_timer(0.15).timeout
-	
-	await get_tree().create_timer(0.3).timeout
-	summoning_active = false
+	# Fin de l'attaque rapide
+	sprite.speed_scale = 1.0
+	is_rapid_attacking = false
 	
 	if player != null and is_instance_valid(player):
 		state = "chase"
 	else:
 		state = "random_walk"
 
-func _spawn_zombie(offset: Vector2):
+# ===== 🧟 INVOCATION AMÉLIORÉE (spawn sécurisé) =====
+func _summon_zombies():
+	state = "attack"
+	velocity.x = 0
+	summon_timer = summon_cooldown
+	summoning_active = true
+	
+	print("🧟 INVOCATION DE LA HORDE!")
+	sprite.play("attaque")
+	
+	# Effet visuel d'invocation
+	for i in range(5):
+		sprite.modulate = Color(0.8, 0.3, 1)
+		$AudioStreamPlayer2D3.play()
+		await get_tree().create_timer(0.12).timeout
+		sprite.modulate = Color(1, 1, 1)
+		await get_tree().create_timer(0.12).timeout
+	
+	var zombie_count = randi_range(3, 5) if is_enraged else randi_range(2, 3)
+	$AudioStreamPlayer2D2.play()
+	print("🧟 Invocation de ", zombie_count, " zombies!")
+	
+	for i in range(zombie_count):
+		var offset = Vector2(randf_range(-250, 250), randf_range(-80, 20))
+		var spawn_pos = _find_safe_spawn_position(offset)
+		_spawn_zombie(spawn_pos)
+		await get_tree().create_timer(0.2).timeout
+	
+	await get_tree().create_timer(0.5).timeout
+	summoning_active = false
+	
+	state = "chase" if player != null and is_instance_valid(player) else "random_walk"
+
+# ===== 🎯 SPAWN SÉCURISÉ (évite les murs) =====
+func _find_safe_spawn_position(offset: Vector2) -> Vector2:
+	var test_pos = global_position + offset
+	var space_state = get_world_2d().direct_space_state
+	
+	# Vérifier s'il y a un mur à cette position
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = test_pos
+	query.collision_mask = 1  # Layer des murs/sols
+	query.exclude = [self]
+	
+	var result = space_state.intersect_point(query, 1)
+	
+	# Si pas de collision avec un mur, position OK
+	if result.is_empty():
+		return test_pos
+	
+	# Sinon, essayer de l'autre côté du boss
+	var opposite_offset = Vector2(-offset.x, offset.y)
+	test_pos = global_position + opposite_offset
+	query.position = test_pos
+	result = space_state.intersect_point(query, 1)
+	
+	if result.is_empty():
+		return test_pos
+	
+	# En dernier recours, spawn juste à côté du boss
+	return global_position + Vector2(50 if randf() > 0.5 else -50, -20)
+
+func _spawn_zombie(spawn_position: Vector2):
 	if not enemy_scene:
 		print("❌ Erreur: enemy.tscn non trouvé!")
 		return
 	
 	var zombie = enemy_scene.instantiate()
-	zombie.global_position = global_position + offset
-
-	# ✅ AJOUT AUTOMATIQUE DU GROUPE
+	zombie.global_position = spawn_position
 	zombie.add_to_group("zombie")
-
+	
 	get_parent().add_child(zombie)
 	
+	# Effet d'apparition (fade uniquement, pas de scale)
 	zombie.modulate = Color(1, 1, 1, 0)
+	
 	var tween = create_tween()
 	tween.tween_property(zombie, "modulate", Color(1, 1, 1, 1), 0.5)
 	
 	print("🧟 Zombie spawné à ", zombie.global_position)
 
+# ===== ⚡ DASH ATTACK =====
 func _initiate_dash_attack():
 	state = "dash_attack"
 	dash_attack_timer = dash_attack_cooldown
 	is_charging = true
-
 	velocity.x = 0
+	
 	var dir = sign(player.global_position.x - global_position.x)
 	sprite.flip_h = dir < 0
 	sprite.play("idle")
 	
-	print("⚠️ DASH ATTACK EN PRÉPARATION...")
+	print("⚠️ DASH ATTACK EN CHARGE...")
 	
-	for i in range(5):
-		sprite.modulate = Color(1.5, 0.3, 0.3)
-		await get_tree().create_timer(0.1).timeout
+	# Effet de charge intense (sans scale)
+	for i in range(6):
+		$AudioStreamPlayer2D8.play()
+		sprite.modulate = Color(2, 0.2, 0.2)
+		await get_tree().create_timer(0.08).timeout
 		sprite.modulate = Color(1, 1, 1)
-		await get_tree().create_timer(0.1).timeout
+		await get_tree().create_timer(0.08).timeout
 	
 	is_charging = false
 	
@@ -244,20 +350,19 @@ func _initiate_dash_attack():
 		return
 	
 	dash_timer = dash_attack_duration
-	print("💨 DASH ATTACK!")
+	print("💨 DASH!")
+	$AudioStreamPlayer2D4.play()
 	sprite.play("attaque")
 
 func _do_dash_attack_state():
 	if dash_timer <= 0:
-		if player != null and is_instance_valid(player):
-			state = "chase"
-		else:
-			state = "random_walk"
+		state = "chase" if player != null and is_instance_valid(player) else "random_walk"
 		return
 	
 	var dir = 1 if not sprite.flip_h else -1
 	velocity.x = dir * dash_attack_speed
 
+# ===== 🎯 DÉTECTION COLLISION JOUEUR =====
 func _on_hit_player(body):
 	if dead or hurt:
 		return
@@ -266,29 +371,35 @@ func _on_hit_player(body):
 		if body.name == "Personnages" and is_instance_valid(body):
 			if body.has_method("_die_hit_and_reset"):
 				body._die_hit_and_reset(global_position)
+				$AudioStreamPlayer2D5.play()
+				$AudioStreamPlayer2D7.play()
 				print("💥 Dash attack réussi!")
 		return
 	
 	if attacking:
 		return
 	
+	# Attaque normale avec combo
 	if body.name == "Personnages" and is_instance_valid(body):
 		attacking = true
 		state = "attack"
+		$AudioStreamPlayer2D7.play()
+		$AudioStreamPlayer2D4.play()
 		sprite.play("attaque")
 		
 		var time_since_last = Time.get_ticks_msec() / 1000.0 - last_attack_time
 		if time_since_last < 3.0:
 			combo_attack_count += 1
 			if combo_attack_count >= 3:
-				print("🔥 COMBO x3!")
-				sprite.speed_scale = 1.5
+				print("🔥 COMBO x", combo_attack_count, "!")
+				sprite.speed_scale = 1.8
 		else:
 			combo_attack_count = 1
 		
 		last_attack_time = Time.get_ticks_msec() / 1000.0
 		
 		if body.has_method("_die_hit_and_reset"):
+			$AudioStreamPlayer2D5.play()
 			body._die_hit_and_reset(global_position)
 
 	var anim_length = _get_animation_length("attaque")
@@ -296,10 +407,7 @@ func _on_hit_player(body):
 
 	sprite.speed_scale = 1.0
 	attacking = false
-	if player != null and is_instance_valid(player):
-		state = "chase"
-	else:
-		state = "random_walk"
+	state = "chase" if player != null and is_instance_valid(player) else "random_walk"
 
 func _get_animation_length(anim_name: String) -> float:
 	var frames = sprite.get_sprite_frames()
@@ -311,6 +419,7 @@ func _get_animation_length(anim_name: String) -> float:
 		return 0.0
 	return frame_count / fps
 
+# ===== 💔 PRISE DE DÉGÂTS =====
 func _on_head_hit(body):
 	if dead:
 		return
@@ -333,12 +442,18 @@ func _on_head_hit(body):
 func _take_damage():
 	if hurt or dead:
 		return
+	
 	hp -= 1
 	hurt = true
 	state = "hurt"
+	$AudioStreamPlayer2D6.play()
+	$AudioStreamPlayer2D.play()
 	_flash_red()
 	
-	if not is_enraged and hp <= max_hp * enrage_threshold:
+	print("💢 Boss blessé! HP: ", hp, "/", max_hp)
+	
+	# Mode rage à 3 HP exactement
+	if not is_enraged and hp <= enrage_threshold:
 		_enter_rage_mode()
 	
 	if hp <= 0:
@@ -348,47 +463,57 @@ func _take_damage():
 	sprite.play("hurt")
 	await get_tree().create_timer(0.3).timeout
 	hurt = false
-	if player != null and is_instance_valid(player):
-		state = "chase"
-	else:
-		state = "random_walk"
+	state = "chase" if player != null and is_instance_valid(player) else "random_walk"
 
 func _enter_rage_mode():
 	is_enraged = true
-	print("😡 BOSS EN RAGE! Vie critique!")
+	print("😡 MODE RAGE ACTIVÉ!")
 	
-	for i in range(3):
-		sprite.modulate = Color(1.5, 0.5, 0.5)
+	# Effet visuel intense (sans changer la taille)
+	for i in range(5):
+		$AudioStreamPlayer2D8.play()
+		sprite.modulate = Color(2, 0.3, 0.3)
 		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1)
 		await get_tree().create_timer(0.1).timeout
 	
-	chase_speed *= 1.2
-	flee_speed *= 1.3
+	# Boost permanent
+	chase_speed *= 1.3
+	flee_speed *= 1.4
+	dash_attack_speed *= 1.2
 
 func _flash_red():
 	var old = sprite.modulate
-	sprite.modulate = Color(1,0.3,0.3)
-	await get_tree().create_timer(0.12).timeout
+	sprite.modulate = Color(1.5, 0.2, 0.2)
+	await get_tree().create_timer(0.15).timeout
 	if is_instance_valid(sprite):
 		sprite.modulate = old
 
+# ===== 💀 MORT ÉPIQUE =====
 func _die():
 	dead = true
 	state = "dead"
 	velocity = Vector2.ZERO
-	print("💀 Boss vaincu!")
-	
+	print("💀 BOSS VAINCU!")
+	$AudioStreamPlayer2D10.play()
+	$AudioStreamPlayer2D9.play()
 	sprite.play("meurt")
 	
-	for i in range(5):
-		sprite.modulate = Color(1, 1, 1, 0.3)
+	# Effet de mort dramatique (sans rotation ni scale)
+	for i in range(8):
+		sprite.modulate = Color(1.5, 0.5, 0.5, 0.8)
 		await get_tree().create_timer(0.1).timeout
-		sprite.modulate = Color(1, 1, 1, 1)
+		sprite.modulate = Color(1, 1, 1, 0.4)
 		await get_tree().create_timer(0.1).timeout
+	
+	# Disparition finale
+	var tween = create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.5)
+	await tween.finished
 	
 	queue_free()
 
+# ===== 🎯 DÉTECTION JOUEUR =====
 func _on_player_detected(body):
 	if dead:
 		return
@@ -396,7 +521,8 @@ func _on_player_detected(body):
 		player = body
 		if fleeing_timer <= 0:
 			state = "chase"
-			print("🎯 Cible verrouillée!")
+			$AudioStreamPlayer2D11.play()
+			print("🎯 CIBLE VERROUILLÉE!")
 
 func _on_player_left(body):
 	if body == player:
@@ -405,12 +531,10 @@ func _on_player_left(body):
 			state = "random_walk"
 			print("❓ Cible perdue...")
 
-# ✅ NOUVELLE FONCTION SANS RIEN BRISER
-# Le boss saute automatiquement par-dessus les zombies invoqués
+# ===== 🦘 ÉVITE LES ZOMBIES =====
 func _on_body_entered(body):
-	if dead:
+	if dead or is_rapid_attacking:  # Ne pas sauter pendant l'attaque rapide
 		return
-
 	if body.is_in_group("zombie") and is_on_floor():
-		velocity.y = jump_force
-		sprite.play("jump") 
+		velocity.y = jump_force * 0.7
+		sprite.play("jump")

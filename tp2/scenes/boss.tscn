@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://c81b0dc2qkmub"]
+[gd_scene load_steps=18 format=4 uid="uid://c81b0dc2qkmub"]
 
 [ext_resource type="Script" uid="uid://croohd43ejkjn" path="res://scenes/boss.gd" id="1_dlmty"]
 [ext_resource type="Texture2D" uid="uid://dh6dai82vvu35" path="res://medias/R.png" id="2_5f346"]
@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://br4d7iirw42h1" path="res://sons/Kingdom of Fun.mp3" id="7_2cdgk"]
 [ext_resource type="PackedScene" uid="uid://c14wo7l43p2b3" path="res://scenes/ressort.tscn" id="8_2avx2"]
 [ext_resource type="PackedScene" uid="uid://da0ijhfbphia" path="res://scenes/pause_menu.tscn" id="10_5f346"]
+[ext_resource type="AudioStream" uid="uid://cif5eq6a8wdx3" path="res://sons/Track 4 - A dark dangerous kingdom song, with pixel game final boss style, for a video game (1).wav" id="11_0onds"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_r3bxh"]
 texture = ExtResource("2_neq0i")
@@ -2836,21 +2837,6 @@ text = "FÉLICITATION  !!!!!!"
 [node name="enemyboss" parent="." instance=ExtResource("6_wqpjq")]
 position = Vector2(1028, 440)
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("7_2cdgk")
-volume_db = -0.053
-autoplay = true
-playback_type = 1
-parameters/looping = true
-
-[node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="."]
-position = Vector2(2151, -4)
-stream = ExtResource("7_2cdgk")
-volume_db = -0.053
-autoplay = true
-playback_type = 1
-parameters/looping = true
-
 [node name="AudioStreamPlayer2D3" type="AudioStreamPlayer2D" parent="."]
 position = Vector2(5133, 11)
 stream = ExtResource("7_2cdgk")
@@ -2898,6 +2884,11 @@ shape = SubResource("RectangleShape2D_0onds")
 [node name="PauseMenu" parent="." instance=ExtResource("10_5f346")]
 offset_top = 3.0
 offset_bottom = 3.0
+
+[node name="AudioStreamPlayer2D11" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("11_0onds")
+volume_db = -5.621
+autoplay = true
 
 [connection signal="body_entered" from="Area2D" to="Personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="pique" to="Personnages" method="_on_area_2d_2_body_entered"]

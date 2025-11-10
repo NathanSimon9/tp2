@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=4 uid="uid://c81b0dc2qkmub"]
 
-[ext_resource type="Script" uid="uid://croohd43ejkjn" path="res://scenes/boss.gd" id="1_dlmty"]
+[ext_resource type="Script" uid="uid://croohd43ejkjn" path="res://script/boss.gd" id="1_dlmty"]
 [ext_resource type="Texture2D" uid="uid://dh6dai82vvu35" path="res://medias/R.png" id="2_5f346"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="2_neq0i"]
 [ext_resource type="PackedScene" uid="uid://3uog7aftmdeu" path="res://scenes/logique_personnages.tscn" id="3_jncid"]

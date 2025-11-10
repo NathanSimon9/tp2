@@ -86,3 +86,4 @@ func _explode():
 		await tween.finished
 	
 	queue_free()
+	

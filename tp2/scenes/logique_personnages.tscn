@@ -34,11 +34,15 @@ var max_hp := 3
 var hp := max_hp
 @onready var hearts := $\"../CanvasLayer/HBoxContainer\".get_children()
 
+# --- Invincibilité ---
+var is_invincible := false
+var invincibility_duration := 1.0
+
 # --- Pièces ---
 var coins := 0
-var coins_required := 15  # Nombre de pièces requis
-var has_all_coins := false  # A-t-on toutes les pièces ?
-@onready var coin_label: Label = null  # On l'initialise à null pour éviter les erreurs
+var coins_required := 15
+var has_all_coins := false
+@onready var coin_label: Label = null
 
 # --- Position de départ ---
 var start_position := Vector2.ZERO
@@ -53,6 +57,7 @@ var is_sprinting := false
 func _ready() -> void:
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
+	is_invincible = false
 	update_hearts()
 	
 	# Trouver le label des pièces de manière sécurisée
@@ -68,6 +73,26 @@ func _ready() -> void:
 	# Vérifier si le VictoryLabel existe avant de le modifier
 	if has_node(\"../CanvasLayer2/VictoryLabel\"):
 		$\"../CanvasLayer2/VictoryLabel\".visible = false
+
+# --- Nouvelle fonction pour les checkpoints ---
+func set_checkpoint(new_position: Vector2) -> void:
+	start_position = new_position
+	print(\"🚩 Nouveau point de respawn: \", start_position)
+
+# --- Fonction d'invincibilité ---
+func start_invincibility() -> void:
+	is_invincible = true
+	
+	# Effet de clignotement
+	for i in range(5):  # Clignoter 5 fois (1 seconde)
+		$AnimatedSprite2D.modulate.a = 0.3  # Semi-transparent
+		await get_tree().create_timer(0.1).timeout
+		$AnimatedSprite2D.modulate.a = 1.0  # Opaque
+		await get_tree().create_timer(0.1).timeout
+	
+	is_invincible = false
+	$AnimatedSprite2D.modulate = Color(1,1,1,1)
+	print(\"🛡️ Invincibilité terminée\")
 
 # --- Mets à jour les cœurs ---
 func update_hearts():
@@ -95,7 +120,6 @@ func add_coin(amount: int = 1) -> void:
 	if coins >= coins_required:
 		has_all_coins = true
 		print(\"✅ Toutes les pièces collectées ! Allez à la porte !\")
-		# Tu peux ajouter un effet sonore ou visuel ici
 
 # --- Fonction victoire ---
 func win_game():
@@ -198,7 +222,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		etat_courant = Etat.SAUT
 
-		# ✅ Animation SAUT ou TOMBER
+		# Animation SAUT ou TOMBER
 		if velocity.y > 0:
 			$AnimatedSprite2D.play(\"tomber\")
 		else:
@@ -269,8 +293,9 @@ func _on_area_2d_body_entered(body: Node2D) -> void:
 		_die_and_reset()
 
 func _die_and_reset() -> void:
-	if has_won:
+	if has_won or is_invincible:
 		return
+	
 	etat_courant = Etat.MORT
 	var knock_dir = sign(global_position.x - start_position.x)
 	if knock_dir == 0:
@@ -291,17 +316,27 @@ func _die_and_reset() -> void:
 
 	hp = max(hp, 0)
 	global_position = start_position
+	
+	# Attendre que le personnage se stabilise
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	velocity = Vector2.ZERO
+	etat_courant = Etat.REPOS
+	
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
-	etat_courant = Etat.REPOS
-	velocity = Vector2.ZERO
+	
+	# Invincibilité temporaire
+	start_invincibility()
 
 # --- Mort par ennemi ---
 func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
-	if has_won:
+	if has_won or is_invincible:
 		return
 	if has_died:
 		return
+	
 	has_died = true
 	hp -= 1
 	update_hearts()
@@ -323,10 +358,19 @@ func _die_hit_and_reset(enemy_global_position: Vector2) -> void:
 
 	hp = max(hp, 0)
 	global_position = start_position
+	
+	# Attendre que le personnage se stabilise
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	velocity = Vector2.ZERO
+	etat_courant = Etat.REPOS
+	
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	$AnimatedSprite2D.play(\"repos\")
-	etat_courant = Etat.REPOS
-	velocity = Vector2.ZERO
+	
+	# Invincibilité temporaire
+	start_invincibility()
 
 func apply_spring_force(force: Vector2) -> void:
 	velocity.y = force.y
@@ -347,27 +391,25 @@ func _on_porte_body_entered(body: Node2D) -> void:
 		if has_all_coins:
 			print(\"🎉 Niveau terminé ! Passage au niveau 2...\")
 			
-			# 🔒 FIGER LE PERSONNAGE SUR LA PORTE
+			# FIGER LE PERSONNAGE SUR LA PORTE
 			can_move = false
 			velocity = Vector2.ZERO
 			etat_courant = Etat.REPOS
 			$AnimatedSprite2D.play(\"repos\")
 			
-			# 🚫 DÉSACTIVER LE PANNEAU DE MESSAGE
+			# DÉSACTIVER LE PANNEAU DE MESSAGE
 			if has_node(\"../PanneauMessage\"):
 				var panneau = get_node(\"../PanneauMessage\")
 				if panneau.has_method(\"disable_message\"):
 					panneau.disable_message()
 				else:
-					# Si pas de méthode, désactiver directement
-					panneau.queue_free()  # Ou panneau.visible = false
+					panneau.queue_free()
 			
 			win_game()
 		else:
 			# Afficher un message si pas toutes les pièces
 			var pieces_manquantes = coins_required - coins
 			print(\"❌ Il vous manque encore \", pieces_manquantes, \" pièce(s) !\")
-			# Le panneau de message reste actif pour informer le joueur
 
 # ===== 🔥 NOUVELLE FONCTION : ENTRER DANS LE BOSS (Niveau 2) =====
 func _on_boss_body_entered(body: Node2D) -> void:
@@ -379,19 +421,19 @@ func _on_boss_body_entered(body: Node2D) -> void:
 		if has_all_coins:
 			print(\"🎉 Niveau 2 terminé ! Passage à la zone boss...\")
 			
-			# 🔒 FIGER LE PERSONNAGE
+			# FIGER LE PERSONNAGE
 			can_move = false
 			velocity = Vector2.ZERO
 			etat_courant = Etat.REPOS
 			$AnimatedSprite2D.play(\"repos\")
 			
-			# 🚫 DÉSACTIVER LE PANNEAU DE MESSAGE
+			# DÉSACTIVER LE PANNEAU DE MESSAGE
 			if has_node(\"../PanneauMessage\"):
 				var panneau = get_node(\"../PanneauMessage\")
 				if panneau.has_method(\"disable_message\"):
 					panneau.disable_message()
 				else:
-					panneau.queue_free()  # Ou panneau.visible = false
+					panneau.queue_free()
 			
 			# Lancer l'animation de transition vers le boss
 			if has_node(\"../AnimationPlayer\"):
@@ -401,7 +443,6 @@ func _on_boss_body_entered(body: Node2D) -> void:
 			# Afficher un message si pas toutes les pièces
 			var pieces_manquantes = coins_required - coins
 			print(\"❌ Il vous manque encore \", pieces_manquantes, \" pièce(s) !\")
-			# Le panneau de message reste actif pour informer le joueur
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3lvrx"]

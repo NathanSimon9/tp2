@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=4 uid="uid://dacvp7ushphij"]
+[gd_scene load_steps=28 format=4 uid="uid://dacvp7ushphij"]
 
 [ext_resource type="Texture2D" uid="uid://dh6dai82vvu35" path="res://medias/R.png" id="1_36d61"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_tbs5b"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://b7wxtjdaodmis" path="res://scenes/coin.tscn" id="9_w437x"]
 [ext_resource type="PackedScene" uid="uid://ea4kkm0uasw4" path="res://scenes/affiche.tscn" id="10_rlbik"]
 [ext_resource type="PackedScene" uid="uid://da0ijhfbphia" path="res://scenes/pause_menu.tscn" id="13_u2du6"]
+[ext_resource type="PackedScene" uid="uid://dc2viuhtejl6n" path="res://scenes/checkpoint.tscn" id="14_8wv4y"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xm3wn"]
 texture = ExtResource("1_tbs5b")
@@ -2766,7 +2767,7 @@ tile_map_data = PackedByteArray("AAABAAcAAQABAAsAAAACAAcAAQABAAsAAAADAAcAAQABAAs
 tile_set = SubResource("TileSet_6qnsx")
 
 [node name="personnages" parent="." instance=ExtResource("2_4xu1f")]
-position = Vector2(-1629, 340)
+position = Vector2(-1634, 354)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -3086,10 +3087,10 @@ libraries = {
 [node name="ColorRect" type="ColorRect" parent="."]
 modulate = Color(0, 0, 0, 1)
 self_modulate = Color(0, 0, 0, 0)
-offset_left = -2189.0
-offset_top = -4252.0
-offset_right = 15328.0
-offset_bottom = 5387.0
+offset_left = -1467.0
+offset_top = -3663.0
+offset_right = 16050.0
+offset_bottom = 5976.0
 color = Color(0, 0, 0, 1)
 
 [node name="coin" parent="." instance=ExtResource("9_w437x")]
@@ -3334,6 +3335,12 @@ message = "RAMASSER TOUTE LES PIÈCES"
 
 [node name="coin4" parent="." instance=ExtResource("9_w437x")]
 position = Vector2(5997, 321)
+
+[node name="Checkpoint" parent="." instance=ExtResource("14_8wv4y")]
+position = Vector2(4529, 98)
+
+[node name="Checkpoint2" parent="." instance=ExtResource("14_8wv4y")]
+position = Vector2(9486, -539)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="pique" to="personnages" method="_on_area_2d_2_body_entered"]

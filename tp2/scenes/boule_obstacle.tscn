@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://7wll5uwmyswg" path="res://script/boule_obstacle.gd" id="1_jcodm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jcodm"]
-radius = 32.0
+radius = 33.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_l531s"]
 radius = 36.0

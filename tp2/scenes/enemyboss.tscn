@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://d2csdfvwi63a1"]
+[gd_scene load_steps=38 format=3 uid="uid://d2csdfvwi63a1"]
 
 [ext_resource type="Script" uid="uid://dk6fy7dtthdqi" path="res://script/enemyboss.gd" id="1_mxnp2"]
 [ext_resource type="Texture2D" uid="uid://dmm2fqpnfyui4" path="res://medias/character_zombie_sheet.png" id="2_bp821"]
@@ -14,6 +14,8 @@
 [ext_resource type="AudioStream" uid="uid://cnwnv30r4nnjg" path="res://sons/Firefly_audio_pouff_explosion_variation3.wav" id="12_rsoyd"]
 [ext_resource type="AudioStream" uid="uid://7w4i4u1kgx86" path="res://sons/cartoon-splat-310479.mp3" id="13_sjadb"]
 [ext_resource type="AudioStream" uid="uid://cu07qwj7evn3u" path="res://sons/Firefly_audio_giant_zombie_scream_variation3.wav" id="14_wnyve"]
+[ext_resource type="AudioStream" uid="uid://bcygmqxwrhwj0" path="res://sons/Firefly_audio_fireball_variation1.wav" id="15_rm66r"]
+[ext_resource type="AudioStream" uid="uid://bbdyunt5sq2of" path="res://sons/Firefly_audio_fireball_explosion_variation4.wav" id="16_f23oi"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_erslg"]
 atlas = ExtResource("2_bp821")
@@ -249,3 +251,9 @@ stream = ExtResource("13_sjadb")
 
 [node name="AudioStreamPlayer2D11" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("14_wnyve")
+
+[node name="AudioStreamPlayer2D12" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("15_rm66r")
+
+[node name="AudioStreamPlayer2D13" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("16_f23oi")

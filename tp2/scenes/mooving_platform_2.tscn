@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dcl2p8fttbc6p"]
 
-[ext_resource type="Script" uid="uid://vvpabsi66n0o" path="res://scenes/mooving_platform_2.gd" id="1_wadrl"]
+[ext_resource type="Script" uid="uid://vvpabsi66n0o" path="res://script/mooving_platform_2.gd" id="1_wadrl"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="2_jg6x0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jmiys"]

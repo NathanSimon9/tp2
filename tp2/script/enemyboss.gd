@@ -45,7 +45,7 @@ var summoning_active := false
 # ===== BOULES DE FEU 🔥 =====
 var fireball_attack_timer := 0.0
 var is_fireball_attacking := false
-var fireball_scene = preload("res://scenes/BouleDeFeu.tscn")
+var fireball_scene = preload("res://script/BouleDeFeu.tscn")
 var attack_pattern := 0  # Pour varier les attaques
 
 @onready var hearts := $"../CanvasLayer/HBoxContainer2".get_children()
@@ -212,6 +212,7 @@ func _initiate_fireball_attack():
 	
 	# Animation de charge
 	for i in range(4):
+		$AudioStreamPlayer2D3.play()  # Son de lancement
 		sprite.modulate = Color(2, 0.5, 0.1)
 		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1)
@@ -219,12 +220,13 @@ func _initiate_fireball_attack():
 	
 	# Lancer les boules de feu
 	for i in range(fireball_count):
-		if state != "fireball_attack":  # Si interrompu
+		if state != "fireball_attack":  
 			break
 		
 		sprite.play("attaque")
 		_spawn_fireball()
-		$AudioStreamPlayer2D3.play()  # Son de lancement
+		$AudioStreamPlayer2D12.play()
+		  # Son de lancement
 		
 		# Flash orange pour chaque tir
 		sprite.modulate = Color(2, 0.7, 0.2)

@@ -1,0 +1,85 @@
+[gd_scene load_steps=9 format=3 uid="uid://dc2viuhtejl6n"]
+
+[ext_resource type="Script" uid="uid://co3s0advw04km" path="res://checkpoint.gd" id="1_ywqth"]
+[ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="2_vsimk"]
+[ext_resource type="AudioStream" uid="uid://dp50poleo82y" path="res://sons/Firefly_audio_tading_variation4.wav" id="3_vsimk"]
+[ext_resource type="AudioStream" uid="uid://dehv6vog4a4c4" path="res://sons/Firefly_audio_pan_pan_pannn_variation1.wav" id="4_yqsag"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yqsag"]
+size = Vector2(20, 62)
+
+[sub_resource type="Animation" id="Animation_ywqth"]
+resource_name = "activate"
+length = 10.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Spritesheet-tiles-default:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.10127, 0.20127, 0.30284, 0.40284, 0.502661, 0.602661, 0.704934, 0.804934, 0.903236, 1.00324, 1.1, 1.19873, 1.3003, 1.4003, 1.50012, 1.60012, 1.70239, 1.80239, 1.9007, 2.0007, 2.10012, 2.20012, 2.30169, 2.40169, 2.50151, 2.60151, 2.70378, 2.80378, 2.90209, 3.00209, 3.09885, 3.19758, 3.29915, 3.39915, 3.49897, 3.59897, 3.70125, 3.80125, 3.89955, 3.99955, 4.09896, 4.19896, 4.30053, 4.40053, 4.50035, 4.60035, 4.70263, 4.80263, 4.90093, 5.00093, 5.09769, 5.19642, 5.29799, 5.39799, 5.49782, 5.59782, 5.70009, 5.80009, 5.89839, 5.99839, 6.09781, 6.19781, 6.29938, 6.39938, 6.49921, 6.59921, 6.70148, 6.80148, 6.89978, 6.99978, 7.09654, 7.19527, 7.29685, 7.39684, 7.49667, 7.59667, 7.69894, 7.79894, 7.89724, 7.99724, 8.05066, 8.15067, 8.25224, 8.35223, 8.45206, 8.55206, 8.65433, 8.75433, 8.85263, 8.95263, 9.0494, 9.14813, 9.2497, 9.3497, 9.44952, 9.54952, 9.65179, 9.75179, 9.85009, 9.95009, 10.0495, 10.1495, 10.2511, 10.3511, 10.4509, 10.5509, 10.6532, 10.7532, 10.8515, 10.9515, 11.0482, 11.147, 11.2485, 11.3485, 11.4484, 11.5484, 11.6506, 11.7506, 11.8489, 11.9489),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [194, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266, 248, 266]
+}
+
+[sub_resource type="Animation" id="Animation_vsimk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Spritesheet-tiles-default:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [194]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yqsag"]
+_data = {
+&"RESET": SubResource("Animation_vsimk"),
+&"activate": SubResource("Animation_ywqth")
+}
+
+[node name="Checkpoint" type="Area2D"]
+script = ExtResource("1_ywqth")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, 132)
+shape = SubResource("RectangleShape2D_yqsag")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 40
+one_shot = true
+explosiveness = 1.0
+direction = Vector2(0, -1)
+spread = 68.0
+gravity = Vector2(0, 98)
+initial_velocity_min = 50.0
+initial_velocity_max = 150.0
+scale_amount_max = 1.5
+color = Color(1, 1, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_yqsag")
+}
+speed_scale = 0.518
+
+[node name="Spritesheet-tiles-default" type="Sprite2D" parent="."]
+position = Vector2(23, 131)
+texture = ExtResource("2_vsimk")
+hframes = 18
+vframes = 18
+frame = 194
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_vsimk")
+
+[node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_yqsag")

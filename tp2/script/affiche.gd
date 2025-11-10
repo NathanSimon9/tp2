@@ -12,7 +12,7 @@ func show_message(_body):
 	$Timer.start()
 	$Message.show()
 	$Message/fond/etiquette.text = message
-	await $Timer.timeoutDddWawd
+	await $Timer.timeout
 	$Message.hide()
 
 

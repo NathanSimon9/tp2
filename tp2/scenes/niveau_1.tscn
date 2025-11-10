@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=4 uid="uid://bryempit8ffdx"]
+[gd_scene load_steps=40 format=4 uid="uid://bryempit8ffdx"]
 
 [ext_resource type="Texture2D" uid="uid://jjtiemfhppyw" path="res://medias/Backgrounds/backgroundEmpty.png" id="1_j1d38"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="1_j5833"]
@@ -26,6 +26,7 @@
 [ext_resource type="AudioStream" uid="uid://br4d7iirw42h1" path="res://sons/Kingdom of Fun.mp3" id="24_0j4r4"]
 [ext_resource type="PackedScene" uid="uid://c1c7xqnnqgo8g" path="res://scenes/moving_platform.tscn" id="25_o5ck2"]
 [ext_resource type="PackedScene" uid="uid://da0ijhfbphia" path="res://scenes/pause_menu.tscn" id="26_7mjfh"]
+[ext_resource type="PackedScene" uid="uid://dc2viuhtejl6n" path="res://scenes/checkpoint.tscn" id="27_gp3mn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7mjfh"]
 texture = ExtResource("1_j5833")
@@ -1225,6 +1226,9 @@ offset_left = -4213.0
 offset_top = -3518.0
 offset_right = 8965.0
 offset_bottom = 6121.0
+
+[node name="Checkpoint" parent="." instance=ExtResource("27_gp3mn")]
+position = Vector2(3154, 226)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="Area2D2" to="personnages" method="_on_area_2d_2_body_entered"]

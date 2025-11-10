@@ -14,9 +14,10 @@ extends CharacterBody2D
 @export var dash_attack_cooldown := 5.0
 @export var dash_attack_duration := 0.5
 
-# ===== NOUVELLES FONCTIONNALITÉS COOL =====
-@export var rapid_attack_cooldown := 8.0
-@export var rapid_attack_count := 3
+# ===== ATTAQUE BOULES DE FEU 🔥 =====
+@export var fireball_attack_cooldown := 8.0
+@export var fireball_count := 6  # Nombre de boules de feu par salve
+@export var fireball_delay := 0.3  # Délai entre chaque boule
 
 var hp := max_hp
 var state := "idle"
@@ -41,9 +42,10 @@ var summon_timer := 0.0
 var enemy_scene = preload("res://scenes/enemy.tscn")
 var summoning_active := false
 
-# ===== NOUVELLES CAPACITÉS =====
-var rapid_attack_timer := 0.0
-var is_rapid_attacking := false
+# ===== BOULES DE FEU 🔥 =====
+var fireball_attack_timer := 0.0
+var is_fireball_attacking := false
+var fireball_scene = preload("res://scenes/BouleDeFeu.tscn")
 var attack_pattern := 0  # Pour varier les attaques
 
 @onready var hearts := $"../CanvasLayer/HBoxContainer2".get_children()
@@ -67,7 +69,7 @@ func _ready():
 	update_hearts()
 	
 	print("🔥 BOSS READY - HP: ", hp, "/", max_hp)
-	print("🎮 Nouvelles capacités : Dash, Attaque Rapide x3, Invocation")
+	print("🎮 Nouvelles capacités : Dash, Boules de Feu, Invocation")
 
 func update_hearts():
 	for i in range(len(hearts)):
@@ -95,21 +97,21 @@ func _physics_process(delta: float):
 	if summon_timer > 0:
 		summon_timer -= delta
 	
-	if rapid_attack_timer > 0:
-		rapid_attack_timer -= delta
+	if fireball_attack_timer > 0:
+		fireball_attack_timer -= delta
 
 	# Gravité
 	velocity.y += gravity * delta
 
 	# États spéciaux qui bloquent le mouvement horizontal
-	if is_charging or is_rapid_attacking:
+	if is_charging or is_fireball_attacking:
 		velocity.x = 0
 		move_and_slide()
 		return
 
 	# Machine à états
 	match state:
-		"rapid_attack":
+		"fireball_attack":
 			pass  # Géré par la coroutine
 		"dash_attack":
 			_do_dash_attack_state()
@@ -139,11 +141,11 @@ func _do_chase_state(delta):
 		_summon_zombies()
 		return
 	
-	# 🔥 ATTAQUE RAPIDE (quand il reste 5 HP ou moins)
-	if hp <= 5 and rapid_attack_timer <= 0 and distance < 150 and is_on_floor():
+	# 🔥 ATTAQUE BOULES DE FEU (quand il reste 5 HP ou moins)
+	if hp <= 5 and fireball_attack_timer <= 0 and distance < 500:
 		attack_pattern = (attack_pattern + 1) % 3
 		if attack_pattern == 0:  # 1 chance sur 3
-			_initiate_rapid_attack()
+			_initiate_fireball_attack()
 			return
 	
 	# ⚡ DASH ATTACK (seulement en rage)
@@ -167,7 +169,7 @@ func _do_chase_state(delta):
 	# Saut vers le joueur
 	if player.global_position.y < global_position.y - 40 and is_on_floor():
 		velocity.y = jump_force
-		if state != "attack" and state != "rapid_attack":
+		if state != "attack" and state != "fireball_attack":
 			sprite.play("jump")
 
 func _do_random_walk(delta: float):
@@ -193,53 +195,84 @@ func _do_fleeing_state():
 	
 	sprite.play("walk")
 
-# ===== 🔥 NOUVELLE ATTAQUE : RAFALE RAPIDE =====
-func _initiate_rapid_attack():
+# ===== 🔥 NOUVELLE ATTAQUE : BOULES DE FEU =====
+func _initiate_fireball_attack():
 	if player == null or not is_instance_valid(player):
 		return
 	
-	state = "rapid_attack"
-	rapid_attack_timer = rapid_attack_cooldown
-	is_rapid_attacking = true
+	state = "fireball_attack"
+	fireball_attack_timer = fireball_attack_cooldown
+	is_fireball_attacking = true
 	velocity.x = 0
 	
 	var dir = sign(player.global_position.x - global_position.x)
 	sprite.flip_h = dir < 0
 	
-	print("🔥 ATTAQUE RAPIDE x3!")
+	print("🔥 ATTAQUE BOULES DE FEU x", fireball_count, "!")
 	
-	# Faire 3 attaques rapides
-	for i in range(rapid_attack_count):
-		if state != "rapid_attack":  # Si interrompu
+	# Animation de charge
+	for i in range(4):
+		sprite.modulate = Color(2, 0.5, 0.1)
+		await get_tree().create_timer(0.1).timeout
+		sprite.modulate = Color(1, 1, 1)
+		await get_tree().create_timer(0.1).timeout
+	
+	# Lancer les boules de feu
+	for i in range(fireball_count):
+		if state != "fireball_attack":  # Si interrompu
 			break
 		
-		# Flash rouge avant chaque attaque
-		sprite.modulate = Color(2, 0.3, 0.3)
+		sprite.play("attaque")
+		_spawn_fireball()
+		$AudioStreamPlayer2D3.play()  # Son de lancement
+		
+		# Flash orange pour chaque tir
+		sprite.modulate = Color(2, 0.7, 0.2)
 		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1)
 		
-		# Attaque
-		sprite.play("attaque")
-		sprite.speed_scale = 2.0  # Attaque ultra rapide
-		
-		# Vérifier si le joueur est touché
-		if player != null and is_instance_valid(player):
-			var distance = global_position.distance_to(player.global_position)
-			if distance < 80:  # Portée d'attaque
-				if player.has_method("_die_hit_and_reset"):
-					player._die_hit_and_reset(global_position)
-					print("💥 Touché! (", i+1, "/", rapid_attack_count, ")")
-		
-		await get_tree().create_timer(0.3).timeout
+		await get_tree().create_timer(fireball_delay).timeout
 	
-	# Fin de l'attaque rapide
-	sprite.speed_scale = 1.0
-	is_rapid_attacking = false
+	# Fin de l'attaque
+	is_fireball_attacking = false
 	
 	if player != null and is_instance_valid(player):
 		state = "chase"
 	else:
 		state = "random_walk"
+
+# ===== 🔥 CRÉER UNE BOULE DE FEU =====
+func _spawn_fireball():
+	if not fireball_scene:
+		print("❌ Erreur: BouleDeFeu.tscn non trouvé!")
+		return
+	
+	var fireball = fireball_scene.instantiate()
+	
+	# Position de spawn (devant le boss)
+	var spawn_offset = Vector2(60 if not sprite.flip_h else -60, -20)
+	fireball.global_position = global_position + spawn_offset
+	
+	# Direction vers le joueur (avec un peu de variation)
+	var direction = Vector2.ZERO
+	if player != null and is_instance_valid(player):
+		direction = (player.global_position - fireball.global_position).normalized()
+		# Ajouter une variation aléatoire pour rendre ça plus difficile à éviter
+		var angle_variation = randf_range(-0.3, 0.3)
+		direction = direction.rotated(angle_variation)
+	else:
+		# Si pas de joueur, tirer vers l'avant
+		direction = Vector2(1 if not sprite.flip_h else -1, 0)
+	
+	# Appliquer la direction à la boule de feu (si elle a une propriété direction ou velocity)
+	if fireball.has_method("set_direction"):
+		fireball.set_direction(direction)
+	elif "direction" in fireball:
+		fireball.direction = direction
+	
+	get_parent().add_child(fireball)
+	
+	print("🔥 Boule de feu lancée!")
 
 # ===== 🧟 INVOCATION AMÉLIORÉE (spawn sécurisé) =====
 func _summon_zombies():
@@ -533,7 +566,7 @@ func _on_player_left(body):
 
 # ===== 🦘 ÉVITE LES ZOMBIES =====
 func _on_body_entered(body):
-	if dead or is_rapid_attacking:  # Ne pas sauter pendant l'attaque rapide
+	if dead or is_fireball_attacking:  # Ne pas sauter pendant l'attaque de feu
 		return
 	if body.is_in_group("zombie") and is_on_floor():
 		velocity.y = jump_force * 0.7

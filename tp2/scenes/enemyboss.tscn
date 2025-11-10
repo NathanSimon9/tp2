@@ -162,7 +162,7 @@ size = Vector2(111.5, 192.5)
 size = Vector2(111, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dxj81"]
-size = Vector2(1530, 422)
+size = Vector2(2991, 784)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bp821"]
 size = Vector2(133, 197)
@@ -197,7 +197,7 @@ target_position = Vector2(102, 0)
 [node name="Detection" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Detection"]
-position = Vector2(2, -23)
+position = Vector2(-2.5, -56)
 shape = SubResource("RectangleShape2D_dxj81")
 
 [node name="HitPlayer" type="Area2D" parent="."]

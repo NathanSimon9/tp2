@@ -36,7 +36,9 @@ var hp := max_hp
 
 # --- Pièces ---
 var coins := 0
-@onready var coin_label := $\"../CanvasLayer/CoinCounter/Label\"
+var coins_required := 15  # Nombre de pièces requis
+var has_all_coins := false  # A-t-on toutes les pièces ?
+@onready var coin_label: Label = null  # On l'initialise à null pour éviter les erreurs
 
 # --- Position de départ ---
 var start_position := Vector2.ZERO
@@ -52,8 +54,20 @@ func _ready() -> void:
 	$AnimatedSprite2D.modulate = Color(1,1,1,1)
 	start_position = global_position
 	update_hearts()
+	
+	# Trouver le label des pièces de manière sécurisée
+	if has_node(\"../CanvasLayer/CoinCounter/Label\"):
+		coin_label = get_node(\"../CanvasLayer/CoinCounter/Label\")
+	elif has_node(\"../UI/CoinCounter/Label\"):
+		coin_label = get_node(\"../UI/CoinCounter/Label\")
+	else:
+		print(\"⚠️ Label des pièces non trouvé! (Normal si pas de pièces dans ce niveau)\")
+	
 	update_coins()
-	$\"../CanvasLayer2/VictoryLabel\".visible = false
+	
+	# Vérifier si le VictoryLabel existe avant de le modifier
+	if has_node(\"../CanvasLayer2/VictoryLabel\"):
+		$\"../CanvasLayer2/VictoryLabel\".visible = false
 
 # --- Mets à jour les cœurs ---
 func update_hearts():
@@ -65,7 +79,10 @@ func update_hearts():
 
 # --- Mets à jour les pièces ---
 func update_coins():
-	coin_label.text = str(coins)
+	if coin_label != null:
+		coin_label.text = str(coins) + \"/\" + str(coins_required)
+	else:
+		print(\"Pièces: \", coins, \"/\", coins_required)
 
 # --- Ajoute une pièce ---
 func add_coin(amount: int = 1) -> void:
@@ -73,8 +90,12 @@ func add_coin(amount: int = 1) -> void:
 		return
 	coins += amount
 	update_coins()
-	if coins > 14:
-		win_game()
+	
+	# Vérifier si on a toutes les pièces
+	if coins >= coins_required:
+		has_all_coins = true
+		print(\"✅ Toutes les pièces collectées ! Allez à la porte !\")
+		# Tu peux ajouter un effet sonore ou visuel ici
 
 # --- Fonction victoire ---
 func win_game():
@@ -82,45 +103,60 @@ func win_game():
 		return
 	has_won = true
 
+	# Vérifier que les nœuds existent avant de les utiliser
 	if has_node(\"../CanvasLayer2/VictoryLabel\"):
 		$\"../CanvasLayer2/VictoryLabel\".visible = true
+	
 	if has_node(\"../AnimationPlayer\"):
 		$\"../AnimationPlayer\".play(\"new_animation\")
-
-	$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
+		$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
+	else:
+		# Si pas d'AnimationPlayer, passer directement au niveau suivant
+		await get_tree().create_timer(2.0).timeout
+		get_tree().change_scene_to_file(\"res://scenes/niveau_2.tscn\")
 
 func _on_animation_finished(anim_name: String) -> void:
 	if anim_name == \"new_animation\":
 		get_tree().change_scene_to_file(\"res://scenes/niveau_2.tscn\")
 	if anim_name == \"RESET\":
 		get_tree().change_scene_to_file(\"res://scenes/boss.tscn\")
-		
-	$AudioStreamPlayer2D6.play()
-	$\"../AudioStreamPlayer2D\".stop()
-	$\"../AudioStreamPlayer2D2\".stop()
-	$\"../AudioStreamPlayer2D3\".stop()
-	$\"../AudioStreamPlayer2D4\".stop()
+	
+	# Arrêter les sons de manière sécurisée
+	if has_node(\"../AudioStreamPlayer2D\"):
+		$\"../AudioStreamPlayer2D\".stop()
+	if has_node(\"../AudioStreamPlayer2D2\"):
+		$\"../AudioStreamPlayer2D2\".stop()
+	if has_node(\"../AudioStreamPlayer2D3\"):
+		$\"../AudioStreamPlayer2D3\".stop()
+	if has_node(\"../AudioStreamPlayer2D4\"):
+		$\"../AudioStreamPlayer2D4\".stop()
+	
+	if has_node(\"AudioStreamPlayer2D6\"):
+		$AudioStreamPlayer2D6.play()
 
 	can_move = false
 	velocity.x = 0
 	etat_courant = Etat.REPOS
 	$AnimatedSprite2D.play(\"repos\")
 
-	
-
-
 # --- Fonction défaite ---
 func lose_game():
 	if has_won:
 		return
 
-	var victory_label = $\"../CanvasLayer2/VictoryLabel\"
-	victory_label.text = \"Vous avez perdu !\"
-	victory_label.visible = true
+	# Vérifier que le label existe
+	if has_node(\"../CanvasLayer2/VictoryLabel\"):
+		var victory_label = $\"../CanvasLayer2/VictoryLabel\"
+		victory_label.text = \"Vous avez perdu !\"
+		victory_label.visible = true
 
-	$AudioStreamPlayer2D5.play()
-	$\"../AudioStreamPlayer2D3\".stop()
-	$\"../AudioStreamPlayer2D4\".stop()
+	# Arrêter les sons de manière sécurisée
+	if has_node(\"AudioStreamPlayer2D5\"):
+		$AudioStreamPlayer2D5.play()
+	if has_node(\"../AudioStreamPlayer2D3\"):
+		$\"../AudioStreamPlayer2D3\".stop()
+	if has_node(\"../AudioStreamPlayer2D4\"):
+		$\"../AudioStreamPlayer2D4\".stop()
 
 	can_move = false
 	velocity.x = 0
@@ -301,15 +337,71 @@ func _on_area_2d_2_body_entered(body: Node2D) -> void:
 	if body.has_method(\"_die_hit_and_reset\"):
 		body._die_hit_and_reset(global_position)
 
+# ===== 🚪 NOUVELLE FONCTION : ENTRER DANS LA PORTE (Niveau 1) =====
+func _on_porte_body_entered(body: Node2D) -> void:
+	if has_won:
+		return
+	
+	if body == self:
+		# Vérifier si le joueur a toutes les pièces
+		if has_all_coins:
+			print(\"🎉 Niveau terminé ! Passage au niveau 2...\")
+			
+			# 🔒 FIGER LE PERSONNAGE SUR LA PORTE
+			can_move = false
+			velocity = Vector2.ZERO
+			etat_courant = Etat.REPOS
+			$AnimatedSprite2D.play(\"repos\")
+			
+			# 🚫 DÉSACTIVER LE PANNEAU DE MESSAGE
+			if has_node(\"../PanneauMessage\"):
+				var panneau = get_node(\"../PanneauMessage\")
+				if panneau.has_method(\"disable_message\"):
+					panneau.disable_message()
+				else:
+					# Si pas de méthode, désactiver directement
+					panneau.queue_free()  # Ou panneau.visible = false
+			
+			win_game()
+		else:
+			# Afficher un message si pas toutes les pièces
+			var pieces_manquantes = coins_required - coins
+			print(\"❌ Il vous manque encore \", pieces_manquantes, \" pièce(s) !\")
+			# Le panneau de message reste actif pour informer le joueur
 
-
-
-
-
+# ===== 🔥 NOUVELLE FONCTION : ENTRER DANS LE BOSS (Niveau 2) =====
 func _on_boss_body_entered(body: Node2D) -> void:
-	if has_node(\"../AnimationPlayer\"):
-		$\"../AnimationPlayer\".play(\"RESET\")
-		$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
+	if has_won:
+		return
+	
+	if body == self:
+		# Vérifier si le joueur a toutes les pièces
+		if has_all_coins:
+			print(\"🎉 Niveau 2 terminé ! Passage à la zone boss...\")
+			
+			# 🔒 FIGER LE PERSONNAGE
+			can_move = false
+			velocity = Vector2.ZERO
+			etat_courant = Etat.REPOS
+			$AnimatedSprite2D.play(\"repos\")
+			
+			# 🚫 DÉSACTIVER LE PANNEAU DE MESSAGE
+			if has_node(\"../PanneauMessage\"):
+				var panneau = get_node(\"../PanneauMessage\")
+				if panneau.has_method(\"disable_message\"):
+					panneau.disable_message()
+				else:
+					panneau.queue_free()  # Ou panneau.visible = false
+			
+			# Lancer l'animation de transition vers le boss
+			if has_node(\"../AnimationPlayer\"):
+				$\"../AnimationPlayer\".play(\"RESET\")
+				$\"../AnimationPlayer\".animation_finished.connect(_on_animation_finished)
+		else:
+			# Afficher un message si pas toutes les pièces
+			var pieces_manquantes = coins_required - coins
+			print(\"❌ Il vous manque encore \", pieces_manquantes, \" pièce(s) !\")
+			# Le panneau de message reste actif pour informer le joueur
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3lvrx"]

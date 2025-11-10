@@ -2793,9 +2793,9 @@ texture = ExtResource("3_1o606")
 stretch_mode = 5
 
 [node name="CoinCounter" type="HBoxContainer" parent="CanvasLayer"]
-offset_left = 27.0
+offset_left = 23.0
 offset_top = 105.0
-offset_right = 200.0
+offset_right = 113.0
 offset_bottom = 172.0
 alignment = 1
 
@@ -2809,12 +2809,6 @@ modulate = Color(0, 0, 1, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "0"
-
-[node name="Label2" type="Label" parent="CanvasLayer/CoinCounter"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 1, 1)
-theme_override_font_sizes/font_size = 48
-text = "/15"
 
 [node name="Area2D" type="Area2D" parent="."]
 
@@ -3333,6 +3327,13 @@ playback_type = 1
 parameters/looping = true
 
 [node name="PauseMenu" parent="." instance=ExtResource("13_u2du6")]
+
+[node name="PanneauMessage2" parent="." groups=["panneaux"] instance=ExtResource("10_rlbik")]
+position = Vector2(12999, 491)
+message = "RAMASSER TOUTE LES PIÈCES"
+
+[node name="coin4" parent="." instance=ExtResource("9_w437x")]
+position = Vector2(5997, 321)
 
 [connection signal="body_entered" from="Area2D" to="personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="pique" to="personnages" method="_on_area_2d_2_body_entered"]

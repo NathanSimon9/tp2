@@ -1,11 +1,10 @@
-[gd_scene load_steps=18 format=4 uid="uid://c81b0dc2qkmub"]
+[gd_scene load_steps=17 format=4 uid="uid://c81b0dc2qkmub"]
 
 [ext_resource type="Script" uid="uid://croohd43ejkjn" path="res://scenes/boss.gd" id="1_dlmty"]
 [ext_resource type="Texture2D" uid="uid://dh6dai82vvu35" path="res://medias/R.png" id="2_5f346"]
 [ext_resource type="Texture2D" uid="uid://bt8k2ei6ugph0" path="res://medias/spritesheet-tiles-default.png" id="2_neq0i"]
 [ext_resource type="PackedScene" uid="uid://3uog7aftmdeu" path="res://scenes/logique_personnages.tscn" id="3_jncid"]
 [ext_resource type="Texture2D" uid="uid://cy1jgaai4p8pj" path="res://medias/coeur.png" id="4_r3bxh"]
-[ext_resource type="Texture2D" uid="uid://dnx8hi2qxag2n" path="res://medias/currency-coin-cartoon-png.png" id="5_wqpjq"]
 [ext_resource type="PackedScene" uid="uid://d2csdfvwi63a1" path="res://scenes/enemyboss.tscn" id="6_wqpjq"]
 [ext_resource type="AudioStream" uid="uid://br4d7iirw42h1" path="res://sons/Kingdom of Fun.mp3" id="7_2cdgk"]
 [ext_resource type="PackedScene" uid="uid://c14wo7l43p2b3" path="res://scenes/ressort.tscn" id="8_2avx2"]
@@ -2719,24 +2718,6 @@ stretch_mode = 5
 layout_mode = 2
 texture = ExtResource("4_r3bxh")
 stretch_mode = 5
-
-[node name="CoinCounter" type="HBoxContainer" parent="CanvasLayer"]
-offset_left = -49.0
-offset_top = 105.0
-offset_right = 196.0
-offset_bottom = 172.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/CoinCounter"]
-layout_mode = 2
-texture = ExtResource("5_wqpjq")
-stretch_mode = 5
-
-[node name="Label" type="Label" parent="CanvasLayer/CoinCounter"]
-modulate = Color(0, 0, 1, 1)
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "0"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 1

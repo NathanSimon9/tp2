@@ -1,27 +1,27 @@
 [gd_scene load_steps=11 format=3 uid="uid://csr78kv7ngkyv"]
 
-[ext_resource type="Script" uid="uid://beehmqc5wk2vw" path="res://scenes/boule_de_feu.gd" id="1_ulvfp"]
-[ext_resource type="Texture2D" uid="uid://bbgryskd3gtm0" path="res://medias/1000_F_228950767_C6WfInWHLF6axLRFmeIkCgteHrPNTauV.png" id="2_5pmns"]
-[ext_resource type="AudioStream" uid="uid://bbdyunt5sq2of" path="res://sons/Firefly_audio_fireball_explosion_variation4.wav" id="3_5pmns"]
+[ext_resource type="Script" uid="uid://beehmqc5wk2vw" path="res://script/boule_de_feu.gd" id="1_c7ihn"]
+[ext_resource type="Texture2D" uid="uid://bbgryskd3gtm0" path="res://medias/1000_F_228950767_C6WfInWHLF6axLRFmeIkCgteHrPNTauV.png" id="2_s7726"]
+[ext_resource type="AudioStream" uid="uid://bbdyunt5sq2of" path="res://sons/Firefly_audio_fireball_explosion_variation4.wav" id="3_hil6p"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cdy8u"]
-atlas = ExtResource("2_5pmns")
+atlas = ExtResource("2_s7726")
 region = Rect2(306, 311, 243, 143)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c7ihn"]
-atlas = ExtResource("2_5pmns")
+atlas = ExtResource("2_s7726")
 region = Rect2(305, 443, 243, 143)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_s7726"]
-atlas = ExtResource("2_5pmns")
+atlas = ExtResource("2_s7726")
 region = Rect2(292, 164, 243, 143)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hil6p"]
-atlas = ExtResource("2_5pmns")
+atlas = ExtResource("2_s7726")
 region = Rect2(756, 168, 243, 143)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rkhe3"]
-atlas = ExtResource("2_5pmns")
+atlas = ExtResource("2_s7726")
 region = Rect2(528, 167, 243, 143)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_hmi6d"]
@@ -52,7 +52,7 @@ radius = 15.9949
 height = 49.9841
 
 [node name="BouleDeFeu" type="Area2D"]
-script = ExtResource("1_ulvfp")
+script = ExtResource("1_c7ihn")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-0.999999, 2)
@@ -67,5 +67,5 @@ rotation = 1.59605
 shape = SubResource("CapsuleShape2D_y4q3f")
 
 [node name="AudioStreamPlayer2D13" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("3_5pmns")
+stream = ExtResource("3_hil6p")
 volume_db = 24.0

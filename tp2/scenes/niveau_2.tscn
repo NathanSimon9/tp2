@@ -2839,7 +2839,7 @@ offset_right = 248.5
 offset_bottom = 39.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 0.246433, 0.701242, 1)
+theme_override_colors/font_color = Color(0.154017, 0.441645, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/line_spacing = -13
@@ -2847,7 +2847,7 @@ theme_override_constants/paragraph_spacing = -18
 theme_override_constants/outline_size = 8
 theme_override_constants/shadow_outline_size = 24
 theme_override_font_sizes/font_size = 90
-text = "FÉLICITATION  !!!!!!"
+text = "Le boss est en colère  !!!!!!"
 
 [node name="danger" type="Node2D" parent="."]
 

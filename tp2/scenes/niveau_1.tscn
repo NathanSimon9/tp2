@@ -1199,7 +1199,7 @@ offset_right = 398.0
 offset_bottom = 59.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 0.246433, 0.701242, 1)
+theme_override_colors/font_color = Color(0, 0.780392, 0.964706, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/line_spacing = -13
@@ -1207,7 +1207,7 @@ theme_override_constants/paragraph_spacing = -18
 theme_override_constants/outline_size = 8
 theme_override_constants/shadow_outline_size = 24
 theme_override_font_sizes/font_size = 90
-text = "FÉLICITATION  !!!!!!"
+text = "Bienvenue dans le chateau  !!!!!!"
 
 [node name="porte" type="Area2D" parent="."]
 

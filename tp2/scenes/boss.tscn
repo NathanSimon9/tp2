@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://c81b0dc2qkmub"]
+[gd_scene load_steps=20 format=4 uid="uid://c81b0dc2qkmub"]
 
 [ext_resource type="Script" uid="uid://croohd43ejkjn" path="res://script/boss.gd" id="1_dlmty"]
 [ext_resource type="Texture2D" uid="uid://dh6dai82vvu35" path="res://medias/R.png" id="2_5f346"]
@@ -630,6 +630,67 @@ size = Vector2(643.37, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0onds"]
 size = Vector2(117, 20)
+
+[sub_resource type="Animation" id="Animation_gp3mn"]
+length = 1.5775
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.5775),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.56),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_7mjfh"]
+resource_name = "new_animation"
+length = 1.7175
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0666667, 1.31),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(0, 0, 0, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.33),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mvy5s"]
+_data = {
+&"RESET": SubResource("Animation_gp3mn"),
+&"new_animation": SubResource("Animation_7mjfh")
+}
 
 [node name="boss" type="Node2D"]
 script = ExtResource("1_dlmty")
@@ -2870,6 +2931,20 @@ offset_bottom = 3.0
 stream = ExtResource("11_0onds")
 volume_db = -5.621
 autoplay = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_mvy5s")
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+modulate = Color(0, 0, 0, 1)
+self_modulate = Color(0, 0, 0, 0)
+offset_left = -7410.0
+offset_top = -4028.0
+offset_right = 10107.0
+offset_bottom = 5611.0
+color = Color(0, 0, 0, 1)
 
 [connection signal="body_entered" from="Area2D" to="Personnages" method="_on_area_2d_body_entered"]
 [connection signal="body_entered" from="pique" to="Personnages" method="_on_area_2d_2_body_entered"]

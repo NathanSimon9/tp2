@@ -94,7 +94,7 @@ Rammasser toutes les pieces sans perdre ses trois vies pour gagner le niveau. Il
 
 # Autre
 
-*Les autre scène son simple. Elles sont un seul node avec son collision shape et une animation au besoin avec un code attacher au parent*
+*Les autre scène son simple. Elles sont un seul node avec son collision shape et une animation au besoin avec un code attaché au parent*
 
 
 

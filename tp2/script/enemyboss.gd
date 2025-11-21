@@ -591,7 +591,8 @@ func _victory_animation_insane():
 	# PHASE 5: Texte VICTOIRE explosif
 	await _show_epic_victory_text()
 	
-	# PHASE 6: PAS DE CONFETTIS (retiré)
+	# PHASE 6: CONFETTIS FESTIFS - Démarrage continu
+	_spawn_continuous_confetti()
 	
 	await get_tree().create_timer(2.0).timeout
 	
@@ -607,8 +608,7 @@ func _epic_explosion():
 		return
 	
 	# Créer plusieurs cercles d'explosion
-	
-	
+	for i in range(5):
 		await get_tree().create_timer(0.1).timeout
 
 # 📷 FLASH PHOTOGRAPHIQUE
@@ -627,8 +627,6 @@ func _photo_flash():
 	tween.tween_property(flash, "color", Color(1, 1, 1, 0), 0.3)
 	await tween.finished
 	flash.queue_free()
-
-# 🌈 ONDE DE CHOC ARC-EN-CIEL (SUPPRIMÉ - plus utilisé)
 
 # 🎬 TEXTE VICTOIRE SIMPLE ET CENTRÉ
 func _show_epic_victory_text():
@@ -677,51 +675,60 @@ func _show_epic_victory_text():
 	var tween3 = create_tween()
 	tween3.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
-# 🎊 MÉGA CONFETTIS QUI TOMBENT
-func _spawn_mega_confetti():
-	var viewport_size = get_viewport().get_visible_rect().size
+# 🎊 CONFETTIS CONTINUS PENDANT TOUTE LA SÉQUENCE
+var confetti_active := false
+
+func _spawn_continuous_confetti():
+	confetti_active = true
+	_confetti_loop()
+
+func _confetti_loop():
+	while confetti_active:
+		var viewport_size = get_viewport().get_visible_rect().size
+		
+		# Spawner 5 confettis à la fois
+		for i in range(5):
+			var confetti = ColorRect.new()
+			
+			# Palette de couleurs festives
+			var colors = [
+				Color(1, 0, 0),      # Rouge
+				Color(1, 0.5, 0),    # Orange
+				Color(1, 1, 0),      # Jaune
+				Color(0, 1, 0),      # Vert
+				Color(0, 0.5, 1),    # Bleu
+				Color(1, 0, 1),      # Magenta
+				Color(1, 0.75, 0.8), # Rose
+				Color(1, 1, 1)       # Blanc
+			]
+			confetti.color = colors[randi() % colors.size()]
+			
+			# Tailles variées
+			var size = Vector2(randf_range(10, 25), randf_range(10, 25))
+			confetti.custom_minimum_size = size
+			
+			# Spawn en haut sur toute la largeur
+			confetti.position = Vector2(randf_range(0, viewport_size.x), randf_range(-300, -100))
+			confetti.z_index = 105
+			
+			var canvas = get_node_or_null("../CanvasLayer")
+			if canvas:
+				canvas.add_child(confetti)
+				
+				var tween = create_tween()
+				tween.set_parallel(true)
+				# Tomber vers le bas
+				tween.tween_property(confetti, "position:y", viewport_size.y + 100, randf_range(3, 6))
+				# Léger mouvement horizontal (balancement)
+				tween.tween_property(confetti, "position:x", confetti.position.x + randf_range(-150, 150), randf_range(3, 6))
+				# Rotation pendant la chute
+				tween.tween_property(confetti, "rotation", randf_range(-PI * 6, PI * 6), randf_range(3, 6))
+				
+				tween.finished.connect(confetti.queue_free)
+		
+		await get_tree().create_timer(0.3).timeout
 	
-	# 150 confettis colorés !
-	for i in range(150):
-		var confetti = ColorRect.new()
-		
-		# Palette de couleurs festives
-		var colors = [
-			Color(1, 0, 0),      # Rouge
-			Color(1, 0.5, 0),    # Orange
-			Color(1, 1, 0),      # Jaune
-			Color(0, 1, 0),      # Vert
-			Color(0, 0.5, 1),    # Bleu
-			Color(1, 0, 1),      # Magenta
-			Color(1, 0.75, 0.8), # Rose
-			Color(1, 1, 1)       # Blanc
-		]
-		confetti.color = colors[randi() % colors.size()]
-		
-		# Tailles variées
-		var size = Vector2(randf_range(10, 25), randf_range(10, 25))
-		confetti.custom_minimum_size = size
-		
-		# Spawn en haut sur toute la largeur
-		confetti.position = Vector2(randf_range(0, viewport_size.x), randf_range(-300, -100))
-		confetti.z_index = 105
-		
-		var canvas = get_node_or_null("../CanvasLayer")
-		if canvas:
-			canvas.add_child(confetti)
-			
-			var tween = create_tween()
-			tween.set_parallel(true)
-			# Tomber vers le bas
-			tween.tween_property(confetti, "position:y", viewport_size.y + 100, randf_range(3, 6))
-			# Léger mouvement horizontal (balancement)
-			tween.tween_property(confetti, "position:x", confetti.position.x + randf_range(-150, 150), randf_range(3, 6))
-			# Rotation pendant la chute
-			tween.tween_property(confetti, "rotation", randf_range(-PI * 6, PI * 6), randf_range(3, 6))
-			
-			tween.finished.connect(confetti.queue_free)
-		
-		await get_tree().create_timer(0.02).timeout
+	print("🎊 Confettis arrêtés")
 
 # 📜 GÉNÉRIQUE DE FIN IMPACTANT
 func _show_end_credits():
@@ -760,6 +767,7 @@ func _show_end_credits():
 	container.anchor_top = 0.5
 	container.anchor_right = 0.5
 	container.anchor_bottom = 0.5
+	container.pivot_offset = Vector2(400, 0)
 	container.position = Vector2(-400, -250)
 	container.custom_minimum_size = Vector2(800, 0)
 	container.add_theme_constant_override("separation", 20)
@@ -779,6 +787,10 @@ func _show_end_credits():
 			label.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
 		
 		container.add_child(label)
+		
+		# IMPORTANT: Calculer le pivot_offset APRÈS l'ajout au conteneur
+		await get_tree().process_frame
+		label.pivot_offset = label.size / 2
 		
 		# Animation d'apparition plus dramatique pour les lignes spéciales
 		if line_data.get("special", false):
@@ -803,6 +815,9 @@ func _show_end_credits():
 	
 	# Attendre avant de continuer
 	await get_tree().create_timer(3.5).timeout
+	
+	# Arrêter les confettis
+	confetti_active = false
 	
 	# Faire disparaître le générique
 	var fade_out = create_tween()
